@@ -1,0 +1,23 @@
+# Dependencias Node.js
+node_modules/
+
+# Build compilado (gerado localmente via tsc)
+dio_explorer/mcp/build/
+
+# Variaveis de ambiente
+.env
+.env.*
+
+# Cache e temporarios
+*.tmp
+data/cache-progresso/
+docs/certificados-emitidos/
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo

@@ -1,0 +1,121 @@
+======================================================================
+  RELATÓRIO DE TESTES — DIO EXPLORER
+  Gerado em: 07/10/2026 19:40:36
+======================================================================
+
+DETALHAMENTO DOS TESTES
+----------------------------------------------------------------------
+test_certificado_codigo_formato_correto (__main__.TestCmdCertificado.test_certificado_codigo_formato_correto)
+O código de verificação deve seguir o padrão DIO-XX-AAAA-NNNNNN. ... ok
+test_certificado_contem_aviso_ficticio (__main__.TestCmdCertificado.test_certificado_contem_aviso_ficticio)
+O certificado deve conter aviso de que é fictício. ... ok
+test_certificado_contem_badges (__main__.TestCmdCertificado.test_certificado_contem_badges)
+O certificado deve conter as badges da trilha Java. ... ok
+test_certificado_contem_codigo_verificacao (__main__.TestCmdCertificado.test_certificado_contem_codigo_verificacao)
+O certificado deve conter um código de verificação DIO. ... ok
+test_certificado_contem_data_emissao (__main__.TestCmdCertificado.test_certificado_contem_data_emissao)
+O certificado deve conter a data de emissão. ... ok
+test_certificado_contem_link_dio (__main__.TestCmdCertificado.test_certificado_contem_link_dio)
+O certificado deve conter link para web.dio.me. ... ok
+test_certificado_contem_modulos (__main__.TestCmdCertificado.test_certificado_contem_modulos)
+O certificado deve conter a quantidade de módulos. ... ok
+test_certificado_contem_nivel (__main__.TestCmdCertificado.test_certificado_contem_nivel)
+O certificado deve conter o nível da trilha. ... ok
+test_certificado_contem_nome_trilha (__main__.TestCmdCertificado.test_certificado_contem_nome_trilha)
+O certificado deve conter o nome da trilha Java. ... ok
+test_certificado_contem_nome_usuario (__main__.TestCmdCertificado.test_certificado_contem_nome_usuario)
+O certificado deve conter o nome do usuário. ... ok
+test_certificado_contem_titulo (__main__.TestCmdCertificado.test_certificado_contem_titulo)
+O certificado deve conter o título 'Certificado de Conclusão'. ... ok
+test_certificado_contem_xp (__main__.TestCmdCertificado.test_certificado_contem_xp)
+O certificado deve conter o XP conquistado. ... ok
+test_certificado_retorna_string (__main__.TestCmdCertificado.test_certificado_retorna_string)
+Deve retornar uma string não-vazia. ... ok
+test_certificado_trilha_inexistente (__main__.TestCmdCertificado.test_certificado_trilha_inexistente)
+Para trilha inexistente deve retornar mensagem de erro. ... ok
+test_certificado_vitalicio_java (__main__.TestCmdCertificado.test_certificado_vitalicio_java)
+A trilha Java é vitalícia — deve aparecer 'Sim' no certificado. ... ok
+test_desafio_contem_descricao (__main__.TestCmdDesafio.test_desafio_contem_descricao)
+O resultado deve conter seção de descrição. ... ok
+test_desafio_contem_entrada_saida (__main__.TestCmdDesafio.test_desafio_contem_entrada_saida)
+O resultado deve conter entrada e saída esperadas. ... ok
+test_desafio_contem_nivel (__main__.TestCmdDesafio.test_desafio_contem_nivel)
+O resultado deve mencionar o nível. ... ok
+test_desafio_contem_tecnologia (__main__.TestCmdDesafio.test_desafio_contem_tecnologia)
+O resultado deve mencionar a tecnologia Java. ... ok
+test_desafio_contem_tempo (__main__.TestCmdDesafio.test_desafio_contem_tempo)
+O resultado deve conter tempo estimado. ... ok
+test_desafio_contem_xp (__main__.TestCmdDesafio.test_desafio_contem_xp)
+O resultado deve conter XP ao concluir. ... ok
+test_desafio_nivel_avancado_xp_correto (__main__.TestCmdDesafio.test_desafio_nivel_avancado_xp_correto)
+Nível Avançado deve gerar 1000 XP. ... ok
+test_desafio_nivel_basico_xp_correto (__main__.TestCmdDesafio.test_desafio_nivel_basico_xp_correto)
+Nível Básico deve gerar 300 XP. ... ok
+test_desafio_nivel_padrao_quando_vazio (__main__.TestCmdDesafio.test_desafio_nivel_padrao_quando_vazio)
+Sem nível, deve assumir Intermediário. ... ok
+test_desafio_retorna_string (__main__.TestCmdDesafio.test_desafio_retorna_string)
+Deve retornar uma string não-vazia. ... ok
+test_desafio_tempo_avancado (__main__.TestCmdDesafio.test_desafio_tempo_avancado)
+Nível Avançado deve ter 120 minutos. ... ok
+test_desafio_tempo_basico (__main__.TestCmdDesafio.test_desafio_tempo_basico)
+Nível Básico deve ter 30 minutos. ... ok
+test_trilha_case_insensitive (__main__.TestCmdTrilha.test_trilha_case_insensitive)
+A busca deve ser case-insensitive. ... ok
+test_trilha_java_badges_corretas (__main__.TestCmdTrilha.test_trilha_java_badges_corretas)
+Todas as badges da trilha Java devem aparecer no resultado. ... ok
+test_trilha_java_contem_badges (__main__.TestCmdTrilha.test_trilha_java_contem_badges)
+O resultado deve listar as badges. ... ok
+test_trilha_java_contem_lives (__main__.TestCmdTrilha.test_trilha_java_contem_lives)
+O resultado deve informar lives ao vivo. ... ok
+test_trilha_java_contem_modulos (__main__.TestCmdTrilha.test_trilha_java_contem_modulos)
+O resultado deve listar os módulos. ... ok
+test_trilha_java_contem_nivel (__main__.TestCmdTrilha.test_trilha_java_contem_nivel)
+O resultado deve conter o campo Nível. ... ok
+test_trilha_java_contem_nome_formacao (__main__.TestCmdTrilha.test_trilha_java_contem_nome_formacao)
+O resultado deve conter o nome da formação Java. ... ok
+test_trilha_java_contem_vitalicio (__main__.TestCmdTrilha.test_trilha_java_contem_vitalicio)
+O resultado deve informar acesso vitalício. ... ok
+test_trilha_java_contem_xp (__main__.TestCmdTrilha.test_trilha_java_contem_xp)
+O resultado deve conter XP Total. ... ok
+test_trilha_java_numero_modulos_correto (__main__.TestCmdTrilha.test_trilha_java_numero_modulos_correto)
+O número de módulos listados deve corresponder ao campo numero_modulo. ... ok
+test_trilha_java_retorna_string (__main__.TestCmdTrilha.test_trilha_java_retorna_string)
+Deve retornar uma string não-vazia. ... ok
+test_trilha_java_xp_correto (__main__.TestCmdTrilha.test_trilha_java_xp_correto)
+O XP exibido deve ser o mesmo do JSON. ... ok
+test_trilha_tecnologia_inexistente (__main__.TestCmdTrilha.test_trilha_tecnologia_inexistente)
+Para tecnologia inexistente deve retornar mensagem de erro. ... ok
+test_buscar_trilha_inexistente (__main__.TestHelpers.test_buscar_trilha_inexistente)
+Deve retornar None para tecnologia inexistente. ... ok
+test_buscar_trilha_java_exato (__main__.TestHelpers.test_buscar_trilha_java_exato)
+Deve encontrar a trilha Java por correspondência exata (case-insensitive). ... ok
+test_buscar_trilha_java_maiusculo (__main__.TestHelpers.test_buscar_trilha_java_maiusculo)
+Deve encontrar a trilha Java com entrada em maiúsculas. ... ok
+test_buscar_trilha_java_minusculo (__main__.TestHelpers.test_buscar_trilha_java_minusculo)
+Deve encontrar a trilha Java mesmo com entrada em minúsculas. ... ok
+test_load_trilhas_campos_obrigatorios (__main__.TestHelpers.test_load_trilhas_campos_obrigatorios)
+Cada trilha deve ter todos os campos obrigatórios. ... ok
+test_load_trilhas_quantidade_minima (__main__.TestHelpers.test_load_trilhas_quantidade_minima)
+O arquivo deve conter pelo menos 30 trilhas. ... ok
+test_load_trilhas_retorna_lista (__main__.TestHelpers.test_load_trilhas_retorna_lista)
+_load_trilhas deve retornar uma lista não-vazia. ... ok
+test_vitalicio_label_false (__main__.TestHelpers.test_vitalicio_label_false) ... ok
+test_vitalicio_label_true (__main__.TestHelpers.test_vitalicio_label_true) ... ok
+
+----------------------------------------------------------------------
+Ran 49 tests in 0.007s
+
+OK
+
+----------------------------------------------------------------------
+RESUMO
+----------------------------------------------------------------------
+  Total de testes executados : 49
+  Aprovados                  : 49
+  Falhas                     : 0
+  Erros                      : 0
+  Taxa de aprovação          : 100.0%
+  Meta mínima                : 70.0%
+  Status geral               : [APROVADO]
+
+======================================================================
