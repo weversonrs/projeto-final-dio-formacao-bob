@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DIO Explorer</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+      background: #0f1117;
+      color: #e2e8f0;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: #1a1d2e;
+      border-bottom: 1px solid #2d3155;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      height: 60px;
+    }
+    header .logo {
+      font-size: 20px;
+      font-weight: 700;
+      color: #a78bfa;
+      letter-spacing: -0.5px;
+    }
+    header .logo span { color: #60a5fa; }
+    header .tagline {
+      font-size: 12px;
+      color: #64748b;
+      border-left: 1px solid #2d3155;
+      padding-left: 16px;
+      margin-left: 4px;
+    }
+
+    /* ── Layout ── */
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 32px 24px;
+    }
+
+    /* ── Tabs ── */
+    .tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 28px;
+      border-bottom: 1px solid #2d3155;
+      padding-bottom: 0;
+    }
+    .tab-btn {
+      background: none;
+      border: none;
+      color: #64748b;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 10px 20px;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: color 0.15s, border-color 0.15s;
+      letter-spacing: 0.3px;
+    }
+    .tab-btn:hover { color: #a78bfa; }
+    .tab-btn.active {
+      color: #a78bfa;
+      border-bottom-color: #a78bfa;
+    }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── Cards ── */
+    .card {
+      background: #1a1d2e;
+      border: 1px solid #2d3155;
+      border-radius: 10px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+    .card-title {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #64748b;
+      margin-bottom: 16px;
+    }
+
+    /* ── Form controls ── */
+    .form-row {
+      display: flex;
+      gap: 12px;
+      align-items: flex-end;
+      flex-wrap: wrap;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1;
+      min-width: 180px;
+    }
+    .form-group label {
+      font-size: 12px;
+      color: #94a3b8;
+      font-weight: 500;
+    }
+    input[type="text"], select {
+      background: #0f1117;
+      border: 1px solid #2d3155;
+      border-radius: 6px;
+      color: #e2e8f0;
+      font-size: 13px;
+      padding: 9px 12px;
+      outline: none;
+      transition: border-color 0.15s;
+      width: 100%;
+    }
+    input[type="text"]:focus, select:focus { border-color: #a78bfa; }
+    input[type="text"]::placeholder { color: #475569; }
+    select option { background: #1a1d2e; }
+
+    .btn {
+      background: #a78bfa;
+      color: #0f1117;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 9px 20px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s, transform 0.1s;
+      align-self: flex-end;
+    }
+    .btn:hover { background: #c4b5fd; }
+    .btn:active { transform: scale(0.97); }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+    /* ── Output ── */
+    .output-box {
+      background: #0f1117;
+      border: 1px solid #2d3155;
+      border-radius: 8px;
+      padding: 20px;
+      min-height: 120px;
+      font-size: 13px;
+      line-height: 1.7;
+      white-space: pre-wrap;
+      word-break: break-word;
+      color: #cbd5e1;
+      margin-top: 16px;
+    }
+    .output-box.empty { color: #475569; font-style: italic; }
+
+    /* ── Markdown rendering ── */
+    .output-box h1 { font-size: 18px; color: #a78bfa; margin-bottom: 8px; font-weight: 700; }
+    .output-box h2 { font-size: 14px; color: #60a5fa; margin: 14px 0 6px; font-weight: 700; }
+    .output-box h3 { font-size: 13px; color: #94a3b8; margin: 10px 0 4px; font-weight: 600; }
+    .output-box strong { color: #e2e8f0; }
+    .output-box em { color: #94a3b8; }
+    .output-box hr { border: none; border-top: 1px solid #2d3155; margin: 12px 0; }
+    .output-box code { background: #2d3155; border-radius: 3px; padding: 1px 5px; font-family: monospace; font-size: 12px; color: #f0abfc; }
+    .output-box ul, .output-box ol { padding-left: 20px; }
+    .output-box li { margin-bottom: 3px; }
+    .output-box table { border-collapse: collapse; width: 100%; margin: 8px 0; font-size: 12px; }
+    .output-box th, .output-box td { border: 1px solid #2d3155; padding: 6px 10px; text-align: left; }
+    .output-box th { background: #1a1d2e; color: #94a3b8; font-weight: 600; }
+    .output-box blockquote { border-left: 3px solid #a78bfa; padding-left: 12px; color: #94a3b8; margin: 8px 0; }
+    .output-box p { margin-bottom: 6px; }
+
+    .output-box.error { color: #f87171; }
+
+    /* ── Trilha grid ── */
+    .trilha-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 12px;
+    }
+    .trilha-card {
+      background: #0f1117;
+      border: 1px solid #2d3155;
+      border-radius: 8px;
+      padding: 14px 16px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .trilha-card:hover { border-color: #a78bfa; background: #1a1d2e; }
+    .trilha-card .tc-name { font-size: 13px; font-weight: 600; color: #e2e8f0; margin-bottom: 4px; }
+    .trilha-card .tc-tech { font-size: 11px; color: #a78bfa; margin-bottom: 6px; }
+    .trilha-card .tc-meta { display: flex; gap: 8px; flex-wrap: wrap; }
+    .badge-pill {
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 20px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+    }
+    .pill-basico   { background: #064e3b; color: #6ee7b7; }
+    .pill-intermediario { background: #1e3a5f; color: #93c5fd; }
+    .pill-avancado { background: #4c1d95; color: #c4b5fd; }
+    .pill-xp       { background: #1c1917; color: #fbbf24; }
+
+    /* ── Stats bar ── */
+    .stats-bar {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    .stat-item {
+      background: #1a1d2e;
+      border: 1px solid #2d3155;
+      border-radius: 8px;
+      padding: 12px 18px;
+      text-align: center;
+      flex: 1;
+      min-width: 100px;
+    }
+    .stat-value { font-size: 22px; font-weight: 700; color: #a78bfa; }
+    .stat-label { font-size: 11px; color: #64748b; margin-top: 2px; }
+
+    /* ── Filter bar ── */
+    .filter-bar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .filter-bar input[type="text"] { max-width: 280px; }
+    .filter-bar select { max-width: 160px; }
+
+    /* ── Loading spinner ── */
+    .spinner {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border: 2px solid #2d3155;
+      border-top-color: #a78bfa;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+      .form-row { flex-direction: column; }
+      .stats-bar { gap: 10px; }
+      .stat-item { min-width: 80px; padding: 10px 12px; }
+      .stat-value { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">DIO <span>Explorer</span></div>
+  <div class="tagline">Plataforma de Trilhas de Aprendizado</div>
+</header>
+
+<div class="container">
+
+  <!-- Stats bar -->
+  <div class="stats-bar" id="statsBar"></div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="trilhas">📚 Trilhas</button>
+    <button class="tab-btn" data-tab="desafio">💻 Desafio</button>
+    <button class="tab-btn" data-tab="desafio-nivel">🎯 Desafio Nível</button>
+    <button class="tab-btn" data-tab="certificado">🎓 Certificado</button>
+  </div>
+
+  <!-- ── Tab: Trilhas ── -->
+  <div class="tab-panel active" id="tab-trilhas">
+    <div class="card">
+      <div class="card-title">Buscar Trilha</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Tecnologia</label>
+          <input type="text" id="trilha-input" placeholder="Ex: Python, React, Java..." />
+        </div>
+        <button class="btn" id="trilha-btn">Buscar</button>
+      </div>
+      <div class="output-box empty" id="trilha-output">Informe uma tecnologia para ver o plano de estudos.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Todas as Trilhas Disponíveis</div>
+      <div class="filter-bar">
+        <input type="text" id="filter-search" placeholder="Filtrar por nome ou tecnologia..." />
+        <select id="filter-nivel">
+          <option value="">Todos os níveis</option>
+          <option value="Básico">Básico</option>
+          <option value="Intermediário">Intermediário</option>
+          <option value="Avançado">Avançado</option>
+        </select>
+      </div>
+      <div class="trilha-grid" id="trilhaGrid"></div>
+    </div>
+  </div>
+
+  <!-- ── Tab: Desafio ── -->
+  <div class="tab-panel" id="tab-desafio">
+    <div class="card">
+      <div class="card-title">💻 /desafio — Desafio de Código</div>
+      <p style="font-size:12px;color:#64748b;margin-bottom:14px;">Gera um desafio simples com descrição, entrada e saída esperada. Níveis: <strong>Básico · Intermediário · Avançado</strong>.</p>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Tecnologia</label>
+          <input type="text" id="desafio-tech" placeholder="Ex: Python, JavaScript, Java..." />
+        </div>
+        <div class="form-group" style="max-width: 180px;">
+          <label>Nível</label>
+          <select id="desafio-nivel">
+            <option value="Básico">Básico</option>
+            <option value="Intermediário" selected>Intermediário</option>
+            <option value="Avançado">Avançado</option>
+          </select>
+        </div>
+        <button class="btn" id="desafio-btn">Gerar Desafio</button>
+      </div>
+      <div class="output-box empty" id="desafio-output">Informe a tecnologia e o nível para gerar um desafio.</div>
+    </div>
+  </div>
+
+  <!-- ── Tab: Desafio Nível (/desafio-nivel) ── -->
+  <div class="tab-panel" id="tab-desafio-nivel">
+    <div class="card">
+      <div class="card-title">🎯 /desafio-nivel — Desafio com Nível Personalizado</div>
+      <p style="font-size:12px;color:#64748b;margin-bottom:14px;">Gera um desafio completo com 2 exemplos, restrições, critérios de avaliação, dica específica e seção bônus. Níveis: <strong>Iniciante · Intermediário · Avançado</strong>.</p>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Tecnologia</label>
+          <input type="text" id="dn-tech" placeholder="Ex: Python, JavaScript, Java..." />
+        </div>
+        <div class="form-group" style="max-width: 200px;">
+          <label>Nível</label>
+          <select id="dn-nivel">
+            <option value="Iniciante">Iniciante</option>
+            <option value="Intermediário" selected>Intermediário</option>
+            <option value="Avançado">Avançado</option>
+          </select>
+        </div>
+        <button class="btn" id="dn-btn">Gerar Desafio</button>
+      </div>
+      <div class="output-box empty" id="dn-output">Informe a tecnologia e o nível para gerar um desafio completo com exemplos e bônus.</div>
+    </div>
+  </div>
+
+  <!-- ── Tab: Certificado ── -->
+  <div class="tab-panel" id="tab-certificado">
+    <div class="card">
+      <div class="card-title">Emitir Certificado</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Seu Nome Completo</label>
+          <input type="text" id="cert-nome" placeholder="Ex: João da Silva" />
+        </div>
+        <div class="form-group">
+          <label>Tecnologia / Formação</label>
+          <input type="text" id="cert-tech" placeholder="Ex: Python, React, Java..." />
+        </div>
+        <button class="btn" id="cert-btn">Emitir Certificado</button>
+      </div>
+      <div class="output-box empty" id="cert-output">Informe seu nome e a tecnologia para emitir o certificado.</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ────────────────────────────────────────────────────────────────────────────
+// Dataset embedded from trilhas_dio.json
+// ────────────────────────────────────────────────────────────────────────────
+const TRILHAS = [
+  {"id":1,"nome":"Formação Python Developer","tecnologia":"Python","nivel":"Básico","numero_modulo":5,"xp_total":3200,"badges_disponiveis":["Python Beginner","Script Master","Data Handler"],"vitalicio":true,"lives_ao_vivo":4},
+  {"id":2,"nome":"Formação Java Developer","tecnologia":"Java","nivel":"Intermediário","numero_modulo":8,"xp_total":5400,"badges_disponiveis":["Java Starter","OOP Expert","Spring Boot Hero"],"vitalicio":true,"lives_ao_vivo":6},
+  {"id":3,"nome":"Formação JavaScript Developer","tecnologia":"JavaScript","nivel":"Básico","numero_modulo":6,"xp_total":3800,"badges_disponiveis":["JS Rookie","DOM Master","ES6+ Pro"],"vitalicio":true,"lives_ao_vivo":5},
+  {"id":4,"nome":"Formação React Developer","tecnologia":"React","nivel":"Intermediário","numero_modulo":7,"xp_total":4900,"badges_disponiveis":["React Starter","Hooks Expert","Redux Master"],"vitalicio":false,"lives_ao_vivo":8},
+  {"id":5,"nome":"Formação Angular Developer","tecnologia":"Angular","nivel":"Intermediário","numero_modulo":9,"xp_total":5600,"badges_disponiveis":["Angular Beginner","Component Wizard","RxJS Pro"],"vitalicio":true,"lives_ao_vivo":7},
+  {"id":6,"nome":"Formação Node.js Developer","tecnologia":"Node.js","nivel":"Intermediário","numero_modulo":7,"xp_total":4700,"badges_disponiveis":["Node Starter","REST API Builder","Express Expert"],"vitalicio":true,"lives_ao_vivo":5},
+  {"id":7,"nome":"Formação Cloud AWS","tecnologia":"AWS","nivel":"Avançado","numero_modulo":12,"xp_total":8200,"badges_disponiveis":["Cloud Practitioner","Solutions Architect","DevOps on AWS"],"vitalicio":false,"lives_ao_vivo":10},
+  {"id":8,"nome":"Formação Cloud Azure","tecnologia":"Microsoft Azure","nivel":"Avançado","numero_modulo":11,"xp_total":7800,"badges_disponiveis":["Azure Fundamentals","Azure Developer","Azure Architect"],"vitalicio":false,"lives_ao_vivo":9},
+  {"id":9,"nome":"Formação Cloud Google","tecnologia":"Google Cloud","nivel":"Avançado","numero_modulo":10,"xp_total":7500,"badges_disponiveis":["GCP Starter","Cloud Engineer","BigQuery Expert"],"vitalicio":true,"lives_ao_vivo":8},
+  {"id":10,"nome":"Formação Machine Learning","tecnologia":"Machine Learning","nivel":"Avançado","numero_modulo":14,"xp_total":9600,"badges_disponiveis":["ML Beginner","Model Trainer","AI Specialist"],"vitalicio":true,"lives_ao_vivo":12},
+  {"id":11,"nome":"Formação Data Science com Python","tecnologia":"Data Science","nivel":"Intermediário","numero_modulo":10,"xp_total":6800,"badges_disponiveis":["Data Analyst","Pandas Pro","Visualization Expert"],"vitalicio":true,"lives_ao_vivo":9},
+  {"id":12,"nome":"Formação Engenharia de Dados","tecnologia":"Data Engineering","nivel":"Avançado","numero_modulo":13,"xp_total":8900,"badges_disponiveis":["Data Engineer","Pipeline Builder","Spark Master"],"vitalicio":false,"lives_ao_vivo":11},
+  {"id":13,"nome":"Formação DevOps Engineer","tecnologia":"DevOps","nivel":"Avançado","numero_modulo":11,"xp_total":7900,"badges_disponiveis":["CI/CD Expert","Docker Captain","Kubernetes Master"],"vitalicio":true,"lives_ao_vivo":10},
+  {"id":14,"nome":"Formação Docker e Kubernetes","tecnologia":"Containers","nivel":"Intermediário","numero_modulo":8,"xp_total":5200,"badges_disponiveis":["Container Starter","Docker Expert","K8s Navigator"],"vitalicio":true,"lives_ao_vivo":6},
+  {"id":15,"nome":"Formação TypeScript Developer","tecnologia":"TypeScript","nivel":"Intermediário","numero_modulo":6,"xp_total":4400,"badges_disponiveis":["TS Beginner","Type Safety Pro","Advanced Types Expert"],"vitalicio":false,"lives_ao_vivo":5},
+  {"id":16,"nome":"Formação Vue.js Developer","tecnologia":"Vue.js","nivel":"Intermediário","numero_modulo":7,"xp_total":4800,"badges_disponiveis":["Vue Starter","Vuex Master","Composition API Pro"],"vitalicio":true,"lives_ao_vivo":6},
+  {"id":17,"nome":"Formação Flutter Developer","tecnologia":"Flutter","nivel":"Intermediário","numero_modulo":9,"xp_total":5900,"badges_disponiveis":["Flutter Beginner","Widget Master","Dart Pro"],"vitalicio":true,"lives_ao_vivo":7},
+  {"id":18,"nome":"Formação Android Developer","tecnologia":"Android","nivel":"Intermediário","numero_modulo":10,"xp_total":6200,"badges_disponiveis":["Android Starter","Kotlin Expert","Jetpack Compose Pro"],"vitalicio":false,"lives_ao_vivo":8},
+  {"id":19,"nome":"Formação iOS Developer","tecnologia":"iOS","nivel":"Avançado","numero_modulo":11,"xp_total":7100,"badges_disponiveis":["Swift Beginner","UIKit Master","SwiftUI Expert"],"vitalicio":false,"lives_ao_vivo":7},
+  {"id":20,"nome":"Formação C# Developer","tecnologia":"C#","nivel":"Intermediário","numero_modulo":8,"xp_total":5100,"badges_disponiveis":["C# Starter",".NET Expert","ASP.NET Pro"],"vitalicio":true,"lives_ao_vivo":6},
+  {"id":21,"nome":"Formação PHP Developer","tecnologia":"PHP","nivel":"Básico","numero_modulo":5,"xp_total":3400,"badges_disponiveis":["PHP Beginner","Laravel Expert","REST with PHP"],"vitalicio":true,"lives_ao_vivo":4},
+  {"id":22,"nome":"Formação Cybersecurity","tecnologia":"Segurança da Informação","nivel":"Avançado","numero_modulo":13,"xp_total":9200,"badges_disponiveis":["Security Analyst","Ethical Hacker","Pen Tester"],"vitalicio":false,"lives_ao_vivo":12},
+  {"id":23,"nome":"Formação Banco de Dados SQL","tecnologia":"SQL","nivel":"Básico","numero_modulo":6,"xp_total":3600,"badges_disponiveis":["SQL Beginner","Query Master","Database Designer"],"vitalicio":true,"lives_ao_vivo":5},
+  {"id":24,"nome":"Formação NoSQL com MongoDB","tecnologia":"MongoDB","nivel":"Intermediário","numero_modulo":7,"xp_total":4600,"badges_disponiveis":["NoSQL Starter","Mongo Expert","Aggregation Pro"],"vitalicio":true,"lives_ao_vivo":6},
+  {"id":25,"nome":"Formação Inteligência Artificial Generativa","tecnologia":"IA Generativa","nivel":"Avançado","numero_modulo":15,"xp_total":10500,"badges_disponiveis":["GenAI Explorer","Prompt Engineer","LLM Specialist"],"vitalicio":false,"lives_ao_vivo":14},
+  {"id":26,"nome":"Formação Engenharia de Prompts","tecnologia":"Prompt Engineering","nivel":"Intermediário","numero_modulo":6,"xp_total":4300,"badges_disponiveis":["Prompt Starter","Context Master","Chain-of-Thought Pro"],"vitalicio":true,"lives_ao_vivo":7},
+  {"id":27,"nome":"Formação Game Developer Unity","tecnologia":"Unity","nivel":"Intermediário","numero_modulo":10,"xp_total":6500,"badges_disponiveis":["Unity Beginner","Game Mechanic Expert","3D Developer"],"vitalicio":true,"lives_ao_vivo":8},
+  {"id":28,"nome":"Formação Blockchain Developer","tecnologia":"Blockchain","nivel":"Avançado","numero_modulo":12,"xp_total":8700,"badges_disponiveis":["Blockchain Starter","Smart Contract Dev","Web3 Expert"],"vitalicio":false,"lives_ao_vivo":10},
+  {"id":29,"nome":"Formação QA Engineer","tecnologia":"Quality Assurance","nivel":"Intermediário","numero_modulo":8,"xp_total":5000,"badges_disponiveis":["QA Starter","Test Automation Pro","Performance Tester"],"vitalicio":true,"lives_ao_vivo":6},
+  {"id":30,"nome":"Formação IBM watsonx AI","tecnologia":"IBM watsonx","nivel":"Avançado","numero_modulo":14,"xp_total":9800,"badges_disponiveis":["watsonx Explorer","AI Model Builder","IBM AI Specialist"],"vitalicio":false,"lives_ao_vivo":13},
+  {"id":31,"nome":"Formação Kotlin Developer","tecnologia":"Kotlin","nivel":"Intermediário","numero_modulo":8,"xp_total":5300,"badges_disponiveis":["Kotlin Starter","Coroutines Expert","Multiplatform Dev"],"vitalicio":true,"lives_ao_vivo":6},
+  {"id":32,"nome":"Formação Go Developer","tecnologia":"Go","nivel":"Intermediário","numero_modulo":7,"xp_total":4900,"badges_disponiveis":["Go Beginner","Concurrency Master","Microservices with Go"],"vitalicio":true,"lives_ao_vivo":5},
+  {"id":33,"nome":"Formação Power BI Analyst","tecnologia":"Power BI","nivel":"Básico","numero_modulo":6,"xp_total":3700,"badges_disponiveis":["BI Starter","Dashboard Designer","DAX Expert"],"vitalicio":true,"lives_ao_vivo":5},
+  {"id":34,"nome":"Formação Linux Fundamentals","tecnologia":"Linux","nivel":"Básico","numero_modulo":5,"xp_total":3100,"badges_disponiveis":["Linux Essentials","Shell Scripter","Sysadmin Starter"],"vitalicio":true,"lives_ao_vivo":4},
+  {"id":35,"nome":"Formação Rust Developer","tecnologia":"Rust","nivel":"Avançado","numero_modulo":10,"xp_total":7200,"badges_disponiveis":["Rust Beginner","Memory Safety Expert","Systems Programmer"],"vitalicio":false,"lives_ao_vivo":7},
+  {"id":36,"nome":"Formação NestJS Developer","tecnologia":"NestJS","nivel":"Intermediário","numero_modulo":7,"xp_total":4800,"badges_disponiveis":["NestJS Starter","REST & GraphQL Pro","Microservices Architect"],"vitalicio":true,"lives_ao_vivo":6},
+  {"id":37,"nome":"Formação Next.js Developer","tecnologia":"Next.js","nivel":"Intermediário","numero_modulo":8,"xp_total":5100,"badges_disponiveis":["Next.js Starter","SSR Expert","Full Stack React Dev"],"vitalicio":true,"lives_ao_vivo":7},
+  {"id":38,"nome":"Formação Spring Boot Expert","tecnologia":"Spring Boot","nivel":"Avançado","numero_modulo":11,"xp_total":7600,"badges_disponiveis":["Spring Starter","REST API Expert","Spring Security Pro"],"vitalicio":false,"lives_ao_vivo":9},
+  {"id":39,"nome":"Formação RPA Developer","tecnologia":"RPA","nivel":"Básico","numero_modulo":6,"xp_total":3500,"badges_disponiveis":["RPA Fundamentals","Automation Anywhere Starter","UiPath Explorer"],"vitalicio":true,"lives_ao_vivo":4},
+  {"id":40,"nome":"Formação Cloud Native Developer","tecnologia":"Cloud Native","nivel":"Avançado","numero_modulo":12,"xp_total":8400,"badges_disponiveis":["Cloud Native Starter","12-Factor App Expert","Service Mesh Pro"],"vitalicio":false,"lives_ao_vivo":10}
+];
+
+const TEMAS = [
+  "sistema de biblioteca","API de e-commerce","jogo da memória",
+  "gerenciador de tarefas","sistema bancário","analisador de logs",
+  "agenda de contatos","conversor de moedas","buscador de CEP"
+];
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
+function buscarTrilha(tecnologia) {
+  const termo = tecnologia.trim().toLowerCase();
+  return TRILHAS.find(t =>
+    termo.includes(t.tecnologia.toLowerCase()) ||
+    t.tecnologia.toLowerCase().includes(termo)
+  );
+}
+
+function vitalicioLabel(v) { return v ? "Sim" : "Não"; }
+
+function hoje() {
+  return new Date().toLocaleDateString("pt-BR");
+}
+
+function randomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function nivelPillClass(nivel) {
+  if (nivel === "Básico") return "pill-basico";
+  if (nivel === "Avançado") return "pill-avancado";
+  return "pill-intermediario";
+}
+
+// ── Simple Markdown → HTML ────────────────────────────────────────────────────
+
+function md(text) {
+  // Tables
+  text = text.replace(/^(\|.+\|)\n(\|[-| :]+\|)\n((?:\|.+\|\n?)*)/gm, (_, head, sep, body) => {
+    const th = head.split('|').filter((c,i,a) => i > 0 && i < a.length-1)
+      .map(c => `<th>${c.trim()}</th>`).join('');
+    const rows = body.trim().split('\n').map(row => {
+      const tds = row.split('|').filter((c,i,a) => i > 0 && i < a.length-1)
+        .map(c => `<td>${c.trim()}</td>`).join('');
+      return `<tr>${tds}</tr>`;
+    }).join('');
+    return `<table><thead><tr>${th}</tr></thead><tbody>${rows}</tbody></table>`;
+  });
+  // Headings
+  text = text.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+  text = text.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+  text = text.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+  // Horizontal rule
+  text = text.replace(/^---$/gm, '<hr>');
+  // Bold + italic
+  text = text.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
+  text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  text = text.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  // Inline code
+  text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
+  // Blockquote
+  text = text.replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
+  // Unordered list
+  text = text.replace(/^(- .+\n?)+/gm, match => {
+    const items = match.trim().split('\n').map(l => `<li>${l.replace(/^- /, '')}</li>`).join('');
+    return `<ul>${items}</ul>`;
+  });
+  // Ordered list
+  text = text.replace(/^(\d+\. .+\n?)+/gm, match => {
+    const items = match.trim().split('\n').map(l => `<li>${l.replace(/^\d+\. /, '')}</li>`).join('');
+    return `<ol>${items}</ol>`;
+  });
+  // Paragraphs (double newline)
+  text = text.replace(/\n\n/g, '</p><p>');
+  text = '<p>' + text + '</p>';
+  // Single newlines
+  text = text.replace(/([^>])\n([^<])/g, '$1<br>$2');
+  // Clean empty paragraphs
+  text = text.replace(/<p>\s*<\/p>/g, '');
+  return text;
+}
+
+// ── Stats bar ─────────────────────────────────────────────────────────────────
+
+function renderStats() {
+  const total = TRILHAS.length;
+  const totalXP = TRILHAS.reduce((s, t) => s + t.xp_total, 0);
+  const niveis = { Básico: 0, Intermediário: 0, Avançado: 0 };
+  TRILHAS.forEach(t => niveis[t.nivel]++);
+
+  document.getElementById('statsBar').innerHTML = `
+    <div class="stat-item"><div class="stat-value">${total}</div><div class="stat-label">Trilhas</div></div>
+    <div class="stat-item"><div class="stat-value">${(totalXP / 1000).toFixed(0)}k</div><div class="stat-label">XP Total</div></div>
+    <div class="stat-item"><div class="stat-value">${niveis['Básico']}</div><div class="stat-label">Básico</div></div>
+    <div class="stat-item"><div class="stat-value">${niveis['Intermediário']}</div><div class="stat-label">Intermediário</div></div>
+    <div class="stat-item"><div class="stat-value">${niveis['Avançado']}</div><div class="stat-label">Avançado</div></div>
+  `;
+}
+
+// ── Trilha grid ───────────────────────────────────────────────────────────────
+
+function renderGrid(list) {
+  const grid = document.getElementById('trilhaGrid');
+  if (!list.length) {
+    grid.innerHTML = '<p style="color:#475569;font-style:italic">Nenhuma trilha encontrada.</p>';
+    return;
+  }
+  grid.innerHTML = list.map(t => `
+    <div class="trilha-card" data-tech="${t.tecnologia}" title="Clique para ver o plano de estudos">
+      <div class="tc-name">${t.nome}</div>
+      <div class="tc-tech">${t.tecnologia}</div>
+      <div class="tc-meta">
+        <span class="badge-pill ${nivelPillClass(t.nivel)}">${t.nivel}</span>
+        <span class="badge-pill pill-xp">${(t.xp_total/1000).toFixed(1)}k XP</span>
+      </div>
+    </div>
+  `).join('');
+
+  grid.querySelectorAll('.trilha-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const tech = card.dataset.tech;
+      document.getElementById('trilha-input').value = tech;
+      showTrilha(tech);
+      document.getElementById('trilha-output').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+}
+
+function filterGrid() {
+  const search = document.getElementById('filter-search').value.toLowerCase();
+  const nivel = document.getElementById('filter-nivel').value;
+  const filtered = TRILHAS.filter(t => {
+    const matchSearch = !search ||
+      t.nome.toLowerCase().includes(search) ||
+      t.tecnologia.toLowerCase().includes(search);
+    const matchNivel = !nivel || t.nivel === nivel;
+    return matchSearch && matchNivel;
+  });
+  renderGrid(filtered);
+}
+
+// ── Trilha command ────────────────────────────────────────────────────────────
+
+function showTrilha(tecnologia) {
+  const out = document.getElementById('trilha-output');
+  if (!tecnologia.trim()) {
+    out.className = 'output-box empty';
+    out.innerHTML = 'Informe uma tecnologia para ver o plano de estudos.';
+    return;
+  }
+
+  out.className = 'output-box';
+  out.innerHTML = '<span class="spinner"></span> Buscando trilha...';
+
+  setTimeout(() => {
+    const trilha = buscarTrilha(tecnologia);
+    if (!trilha) {
+      out.className = 'output-box error';
+      out.innerHTML = `❌ Nenhuma trilha encontrada para "<strong>${tecnologia}</strong>". Verifique o nome e tente novamente.`;
+      return;
+    }
+
+    const modulos = Array.from({ length: trilha.numero_modulo }, (_, i) =>
+      `${i+1}. Módulo ${i+1} — Conteúdo programático do módulo ${i+1} da trilha ${trilha.tecnologia}.`
+    ).join('\n');
+
+    const badges = trilha.badges_disponiveis.map(b => `- 🥇 **${b}**`).join('\n');
+
+    const texto = [
+      `# 📚 Plano de Estudos — ${trilha.nome}`,
+      '',
+      `**Tecnologia:** ${trilha.tecnologia}`,
+      `**Nível:** ${trilha.nivel}`,
+      `**XP Total:** ${trilha.xp_total} XP`,
+      `**Acesso Vitalício:** ${vitalicioLabel(trilha.vitalicio)}`,
+      `**Lives ao Vivo:** ${trilha.lives_ao_vivo}`,
+      '',
+      '---',
+      '',
+      '## 🗂️ Módulos da Trilha',
+      '',
+      modulos,
+      '',
+      '---',
+      '',
+      '## 🏅 Badges Disponíveis',
+      '',
+      badges,
+    ].join('\n');
+
+    out.className = 'output-box';
+    out.innerHTML = md(texto);
+  }, 200);
+}
+
+// ── Desafio command ───────────────────────────────────────────────────────────
+
+function showDesafio() {
+  const tech = document.getElementById('desafio-tech').value.trim();
+  const nivel = document.getElementById('desafio-nivel').value;
+  const out = document.getElementById('desafio-output');
+
+  if (!tech) {
+    out.className = 'output-box error';
+    out.innerHTML = '⚠️ Informe a tecnologia antes de gerar o desafio.';
+    return;
+  }
+
+  out.className = 'output-box';
+  out.innerHTML = '<span class="spinner"></span> Gerando desafio...';
+
+  setTimeout(() => {
+    const xpMap    = { 'Básico': 300, 'Intermediário': 600, 'Avançado': 1000 };
+    const tempoMap = { 'Básico': 30,  'Intermediário': 60,  'Avançado': 120  };
+    const nivelFinal = xpMap[nivel] ? nivel : 'Intermediário';
+    const tema = TEMAS[randomInt(0, TEMAS.length - 1)];
+
+    const texto = [
+      `# 💻 Desafio de Código — ${tech}`,
+      '',
+      `**Nível:** ${nivelFinal}`,
+      `**Tempo estimado:** ${tempoMap[nivelFinal]} minutos`,
+      `**XP ao concluir:** ${xpMap[nivelFinal]} XP`,
+      '',
+      '---',
+      '',
+      '## 📋 Descrição do Desafio',
+      '',
+      `Implemente um ${tema} usando ${tech}. O sistema deve contemplar as operações básicas de CRUD.`,
+      '',
+      '## 📥 Entrada Esperada',
+      'Comandos via linha de comando ou chamadas de função com os dados necessários.',
+      '',
+      '## 📤 Saída Esperada',
+      'Resultados formatados em texto ou JSON conforme o comando executado.',
+    ].join('\n');
+
+    out.className = 'output-box';
+    out.innerHTML = md(texto);
+  }, 200);
+}
+
+// ── Certificado command ───────────────────────────────────────────────────────
+
+function showCertificado() {
+  const nome = document.getElementById('cert-nome').value.trim();
+  const tech = document.getElementById('cert-tech').value.trim();
+  const out = document.getElementById('cert-output');
+
+  if (!nome || !tech) {
+    out.className = 'output-box error';
+    out.innerHTML = '⚠️ Preencha seu nome e a tecnologia para emitir o certificado.';
+    return;
+  }
+
+  out.className = 'output-box';
+  out.innerHTML = '<span class="spinner"></span> Emitindo certificado...';
+
+  setTimeout(() => {
+    const trilha = buscarTrilha(tech);
+    if (!trilha) {
+      out.className = 'output-box error';
+      out.innerHTML = `❌ Trilha "<strong>${tech}</strong>" não encontrada. Verifique o nome da tecnologia ou formação.`;
+      return;
+    }
+
+    const codigo = `DIO-${String(trilha.id).padStart(2,'0')}-${new Date().getFullYear()}-${randomInt(100000,999999)}`;
+    const badges = trilha.badges_disponiveis.map(b => `- 🥇 **${b}**`).join('\n');
+
+    const texto = [
+      '# 🎓 Certificação DIO',
+      '',
+      '---',
+      '',
+      `Atestamos que o **${nome}** completou com sucesso a formação na **${trilha.nome}**.`,
+      '',
+      `**Data de Emissão:** ${hoje()}`,
+      `**Código de Verificação:** \`${codigo}\``,
+      '',
+      '---',
+      '',
+      '## 📋 Informações da Trilha',
+      '',
+      '| Campo | Valor |',
+      '|---|---|',
+      `| **Tecnologia** | ${trilha.tecnologia} |`,
+      `| **Nível** | ${trilha.nivel} |`,
+      `| **Módulos Concluídos** | ${trilha.numero_modulo} módulos |`,
+      `| **XP Conquistado** | ${trilha.xp_total} XP |`,
+      `| **Lives Assistidas** | ${trilha.lives_ao_vivo} lives |`,
+      `| **Acesso Vitalício** | ${vitalicioLabel(trilha.vitalicio)} |`,
+      '',
+      '---',
+      '',
+      '## 🏅 Badges Conquistadas',
+      '',
+      badges,
+      '',
+      '---',
+      '',
+      '*Este certificado é fictício e foi gerado para fins educacionais pelo projeto DIO Explorer.*',
+      '*Verifique certificados reais em: https://web.dio.me*',
+    ].join('\n');
+
+    out.className = 'output-box';
+    out.innerHTML = md(texto);
+  }, 200);
+}
+
+// ── Desafio Avançado (/desafio-nivel) ────────────────────────────────────────
+
+const DOMINIOS = [
+  'e-commerce', 'fintech', 'saúde', 'logística', 'jogos', 'educação',
+  'streaming', 'delivery', 'banking', 'IoT', 'RH', 'agronegócio'
+];
+
+function normalizarNivel(valor) {
+  const v = valor.trim().toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  if (/inici|basic|basico|beginner/.test(v)) return 'Iniciante';
+  if (/avanc|advanced/.test(v)) return 'Avançado';
+  return 'Intermediário';
+}
+
+function showDesafioNivel() {
+  const tech = document.getElementById('dn-tech').value.trim();
+  const nivelRaw = document.getElementById('dn-nivel').value;
+  const out = document.getElementById('dn-output');
+
+  if (!tech) {
+    out.className = 'output-box error';
+    out.innerHTML = '⚠️ Informe a tecnologia antes de gerar o desafio.';
+    return;
+  }
+
+  out.className = 'output-box';
+  out.innerHTML = '<span class="spinner"></span> Gerando desafio...';
+
+  setTimeout(() => {
+    const nivel = normalizarNivel(nivelRaw);
+    const xpMap    = { 'Iniciante': 300, 'Intermediário': 600, 'Avançado': 1000 };
+    const tempoMap = { 'Iniciante': 30,  'Intermediário': 60,  'Avançado': 120  };
+    const dominio  = DOMINIOS[randomInt(0, DOMINIOS.length - 1)];
+    const tema     = TEMAS[randomInt(0, TEMAS.length - 1)];
+
+    const perfilMap = {
+      'Iniciante':     'lógica simples, variáveis, condicionais, laços e funções básicas. Sem bibliotecas externas.',
+      'Intermediário': 'orientação a objetos, coleções, APIs REST, leitura/escrita de arquivos ou estruturas de dados intermediárias.',
+      'Avançado':      'concorrência, design patterns avançados, arquitetura de sistemas, otimização de algoritmos ou integração de múltiplos componentes.',
+    };
+
+    const texto = [
+      `# 💻 Desafio de Código — ${tech}`,
+      '',
+      `**Nível:** ${nivel}`,
+      `**Tempo estimado:** ${tempoMap[nivel]} minutos`,
+      `**XP ao concluir:** ${xpMap[nivel]} XP`,
+      '',
+      '---',
+      '',
+      '## 📋 Descrição do Desafio',
+      '',
+      `Implemente um **${tema}** no contexto de **${dominio}** utilizando **${tech}**.`,
+      `O sistema deve contemplar as operações básicas de CRUD com validação de dados e tratamento de erros.`,
+      `Foco do nível **${nivel}**: ${perfilMap[nivel]}`,
+      `O problema deve ser resolvido de forma clara, testável e bem estruturada.`,
+      '',
+      '---',
+      '',
+      '## 📥 Entrada Esperada',
+      '',
+      `Comandos ou chamadas de função com os dados necessários para operar o ${tema}.`,
+      `Informe os tipos esperados, estrutura dos dados e limites aceitáveis de entrada.`,
+      '',
+      '## 📤 Saída Esperada',
+      '',
+      `Resultado formatado em texto ou JSON conforme a operação executada.`,
+      `Inclua mensagens de erro legíveis para entradas inválidas.`,
+      '',
+      '---',
+      '',
+      '## 💡 Exemplo',
+      '',
+      '```',
+      `Entrada 1:`,
+      `  operacao: "criar", dados: { nome: "Item A", valor: 10 }`,
+      '',
+      `Saída 1:`,
+      `  { id: 1, nome: "Item A", valor: 10, status: "criado" }`,
+      '',
+      `Entrada 2 (caso de borda):`,
+      `  operacao: "criar", dados: { nome: "", valor: -5 }`,
+      '',
+      `Saída 2:`,
+      `  { erro: "Nome inválido e valor deve ser positivo" }`,
+      '```',
+      '',
+      '---',
+      '',
+      '## 🔒 Restrições',
+      '',
+      `- Não utilizar frameworks externos além dos permitidos para ${tech}.`,
+      '- A solução deve cobrir ao menos 3 casos de erro distintos.',
+      `- Complexidade máxima aceitável: O(n log n) para operações de busca.`,
+      '- Tamanho máximo da entrada: 1000 registros.',
+      '',
+      '---',
+      '',
+      '## 🏆 Critérios de Avaliação',
+      '',
+      '- Clareza e organização do código',
+      '- Cobertura dos casos de borda',
+      '- Tratamento adequado de erros',
+      '- Performance e eficiência',
+      `- Uso adequado dos recursos da linguagem ${tech}`,
+      '- Legibilidade e manutenibilidade',
+      '',
+      '---',
+      '',
+      '## 💬 Dica',
+      '',
+      `Comece modelando as entidades do ${tema} antes de escrever qualquer lógica de negócio.`,
+      `Para o nível **${nivel}**, priorize ${nivel === 'Iniciante' ? 'clareza e casos simples' : nivel === 'Avançado' ? 'design robusto e eficiência' : 'abstração e reuso'}.`,
+      '',
+      '---',
+      '',
+      '## 🚀 Bônus (opcional)',
+      '',
+      `Adicione suporte a persistência dos dados em arquivo ou banco de dados.`,
+      `Implemente testes automatizados cobrindo ao menos 80% dos casos do ${tema}.`,
+      `Exponha as operações como uma API REST consumível por outros serviços.`,
+      '',
+      '---',
+    ].join('\n');
+
+    out.className = 'output-box';
+    out.innerHTML = md(texto);
+  }, 200);
+}
+
+// ── Tab routing ───────────────────────────────────────────────────────────────
+
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+  });
+});
+
+// ── Event wiring ──────────────────────────────────────────────────────────────
+
+document.getElementById('trilha-btn').addEventListener('click', () =>
+  showTrilha(document.getElementById('trilha-input').value)
+);
+document.getElementById('trilha-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') showTrilha(e.target.value);
+});
+
+document.getElementById('desafio-btn').addEventListener('click', showDesafio);
+document.getElementById('desafio-tech').addEventListener('keydown', e => {
+  if (e.key === 'Enter') showDesafio();
+});
+
+document.getElementById('dn-btn').addEventListener('click', showDesafioNivel);
+document.getElementById('dn-tech').addEventListener('keydown', e => {
+  if (e.key === 'Enter') showDesafioNivel();
+});
+
+document.getElementById('cert-btn').addEventListener('click', showCertificado);
+document.getElementById('cert-tech').addEventListener('keydown', e => {
+  if (e.key === 'Enter') showCertificado();
+});
+
+document.getElementById('filter-search').addEventListener('input', filterGrid);
+document.getElementById('filter-nivel').addEventListener('change', filterGrid);
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+
+renderStats();
+renderGrid(TRILHAS);
+</script>
+
+</body>
+</html>

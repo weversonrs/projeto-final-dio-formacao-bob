@@ -1,6 +1,10 @@
 ---
+name: trilha
 description: Retorna um plano de estudos formatado para uma tecnologia da DIO
-argument-hint: <tecnologia>
+metadata:
+  user-invocable: true
+  disable-model-invocation: true
+  argument-hint: <tecnologia>
 ---
 
 O usuário quer consultar a trilha de estudos para a tecnologia: **$1**

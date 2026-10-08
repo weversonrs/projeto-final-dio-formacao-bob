@@ -329,6 +329,116 @@
       "badges_disponiveis": ["watsonx Explorer", "AI Model Builder", "IBM AI Specialist"],
       "vitalicio": false,
       "lives_ao_vivo": 13
+    },
+    {
+      "id": 31,
+      "nome": "Formação Kotlin Developer",
+      "tecnologia": "Kotlin",
+      "nivel": "Intermediário",
+      "numero_modulo": 8,
+      "xp_total": 5300,
+      "badges_disponiveis": ["Kotlin Starter", "Coroutines Expert", "Multiplatform Dev"],
+      "vitalicio": true,
+      "lives_ao_vivo": 6
+    },
+    {
+      "id": 32,
+      "nome": "Formação Go Developer",
+      "tecnologia": "Go",
+      "nivel": "Intermediário",
+      "numero_modulo": 7,
+      "xp_total": 4900,
+      "badges_disponiveis": ["Go Beginner", "Concurrency Master", "Microservices with Go"],
+      "vitalicio": true,
+      "lives_ao_vivo": 5
+    },
+    {
+      "id": 33,
+      "nome": "Formação Power BI Analyst",
+      "tecnologia": "Power BI",
+      "nivel": "Básico",
+      "numero_modulo": 6,
+      "xp_total": 3700,
+      "badges_disponiveis": ["BI Starter", "Dashboard Designer", "DAX Expert"],
+      "vitalicio": true,
+      "lives_ao_vivo": 5
+    },
+    {
+      "id": 34,
+      "nome": "Formação Linux Fundamentals",
+      "tecnologia": "Linux",
+      "nivel": "Básico",
+      "numero_modulo": 5,
+      "xp_total": 3100,
+      "badges_disponiveis": ["Linux Essentials", "Shell Scripter", "Sysadmin Starter"],
+      "vitalicio": true,
+      "lives_ao_vivo": 4
+    },
+    {
+      "id": 35,
+      "nome": "Formação Rust Developer",
+      "tecnologia": "Rust",
+      "nivel": "Avançado",
+      "numero_modulo": 10,
+      "xp_total": 7200,
+      "badges_disponiveis": ["Rust Beginner", "Memory Safety Expert", "Systems Programmer"],
+      "vitalicio": false,
+      "lives_ao_vivo": 7
+    },
+    {
+      "id": 36,
+      "nome": "Formação NestJS Developer",
+      "tecnologia": "NestJS",
+      "nivel": "Intermediário",
+      "numero_modulo": 7,
+      "xp_total": 4800,
+      "badges_disponiveis": ["NestJS Starter", "REST & GraphQL Pro", "Microservices Architect"],
+      "vitalicio": true,
+      "lives_ao_vivo": 6
+    },
+    {
+      "id": 37,
+      "nome": "Formação Next.js Developer",
+      "tecnologia": "Next.js",
+      "nivel": "Intermediário",
+      "numero_modulo": 8,
+      "xp_total": 5100,
+      "badges_disponiveis": ["Next.js Starter", "SSR Expert", "Full Stack React Dev"],
+      "vitalicio": true,
+      "lives_ao_vivo": 7
+    },
+    {
+      "id": 38,
+      "nome": "Formação Spring Boot Expert",
+      "tecnologia": "Spring Boot",
+      "nivel": "Avançado",
+      "numero_modulo": 11,
+      "xp_total": 7600,
+      "badges_disponiveis": ["Spring Starter", "REST API Expert", "Spring Security Pro"],
+      "vitalicio": false,
+      "lives_ao_vivo": 9
+    },
+    {
+      "id": 39,
+      "nome": "Formação RPA Developer",
+      "tecnologia": "RPA",
+      "nivel": "Básico",
+      "numero_modulo": 6,
+      "xp_total": 3500,
+      "badges_disponiveis": ["RPA Fundamentals", "Automation Anywhere Starter", "UiPath Explorer"],
+      "vitalicio": true,
+      "lives_ao_vivo": 4
+    },
+    {
+      "id": 40,
+      "nome": "Formação Cloud Native Developer",
+      "tecnologia": "Cloud Native",
+      "nivel": "Avançado",
+      "numero_modulo": 12,
+      "xp_total": 8400,
+      "badges_disponiveis": ["Cloud Native Starter", "12-Factor App Expert", "Service Mesh Pro"],
+      "vitalicio": false,
+      "lives_ao_vivo": 10
     }
   ]
 }

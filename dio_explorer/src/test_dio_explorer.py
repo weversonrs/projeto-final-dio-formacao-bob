@@ -1,7 +1,7 @@
 """
 Testes unitários — DIO Explorer
-Cobre os slash commands /trilha, /desafio e /certificado com foco em Java.
-Meta: >= 70% de aprovação nos casos de teste.
+Cobre os slash commands /trilha, /desafio e /certificado.
+Meta: >= 80% de aprovação nos casos de teste.
 """
 
 import sys
@@ -11,7 +11,7 @@ import json
 import re
 
 # Garante que o módulo src seja encontrado independente de onde o teste rode
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
+sys.path.insert(0, os.path.dirname(__file__))
 
 from dio_explorer import (
     _load_trilhas,
@@ -36,9 +36,9 @@ class TestHelpers(unittest.TestCase):
         self.assertGreater(len(trilhas), 0)
 
     def test_load_trilhas_quantidade_minima(self):
-        """O arquivo deve conter pelo menos 30 trilhas."""
+        """O arquivo deve conter pelo menos 40 trilhas."""
         trilhas = _load_trilhas()
-        self.assertGreaterEqual(len(trilhas), 30)
+        self.assertGreaterEqual(len(trilhas), 40)
 
     def test_load_trilhas_campos_obrigatorios(self):
         """Cada trilha deve ter todos os campos obrigatórios."""
@@ -48,10 +48,45 @@ class TestHelpers(unittest.TestCase):
             for campo in campos:
                 self.assertIn(campo, trilha, f"Campo '{campo}' ausente na trilha id={trilha.get('id')}")
 
+    def test_load_trilhas_ids_unicos(self):
+        """Todos os IDs das trilhas devem ser únicos."""
+        trilhas = _load_trilhas()
+        ids = [t["id"] for t in trilhas]
+        self.assertEqual(len(ids), len(set(ids)), "Existem IDs duplicados no dataset")
+
+    def test_load_trilhas_tecnologias_unicas(self):
+        """Todas as tecnologias devem ser únicas (sem duplicatas)."""
+        trilhas = _load_trilhas()
+        tecnologias = [t["tecnologia"].lower() for t in trilhas]
+        self.assertEqual(len(tecnologias), len(set(tecnologias)), "Existem tecnologias duplicadas no dataset")
+
+    def test_load_trilhas_nivel_valido(self):
+        """O campo 'nivel' de cada trilha deve ser Básico, Intermediário ou Avançado."""
+        niveis_validos = {"Básico", "Intermediário", "Avançado"}
+        for trilha in _load_trilhas():
+            self.assertIn(trilha["nivel"], niveis_validos,
+                          f"Nível inválido '{trilha['nivel']}' na trilha id={trilha['id']}")
+
+    def test_load_trilhas_xp_positivo(self):
+        """O campo 'xp_total' deve ser um inteiro positivo em todas as trilhas."""
+        for trilha in _load_trilhas():
+            self.assertIsInstance(trilha["xp_total"], int)
+            self.assertGreater(trilha["xp_total"], 0,
+                               f"xp_total inválido na trilha id={trilha['id']}")
+
+    def test_load_trilhas_badges_nao_vazias(self):
+        """Cada trilha deve ter pelo menos uma badge disponível."""
+        for trilha in _load_trilhas():
+            self.assertIsInstance(trilha["badges_disponiveis"], list)
+            self.assertGreater(len(trilha["badges_disponiveis"]), 0,
+                               f"badges_disponiveis vazia na trilha id={trilha['id']}")
+
     def test_vitalicio_label_true(self):
+        """_vitalicio_label(True) deve retornar 'Sim'."""
         self.assertEqual(_vitalicio_label(True), "Sim")
 
     def test_vitalicio_label_false(self):
+        """_vitalicio_label(False) deve retornar 'Não'."""
         self.assertEqual(_vitalicio_label(False), "Não")
 
     def test_buscar_trilha_java_exato(self):
@@ -70,10 +105,52 @@ class TestHelpers(unittest.TestCase):
         trilha = _buscar_trilha("JAVA")
         self.assertIsNotNone(trilha)
 
+    def test_buscar_trilha_python(self):
+        """Deve encontrar a trilha Python."""
+        trilha = _buscar_trilha("Python")
+        self.assertIsNotNone(trilha)
+        self.assertEqual(trilha["tecnologia"], "Python")
+
+    def test_buscar_trilha_kotlin(self):
+        """Deve encontrar a trilha Kotlin (adicionada na expansão do dataset)."""
+        trilha = _buscar_trilha("Kotlin")
+        self.assertIsNotNone(trilha)
+        self.assertEqual(trilha["tecnologia"], "Kotlin")
+
+    def test_buscar_trilha_go(self):
+        """Deve encontrar uma trilha ao buscar por 'Go' (pode ser Google Cloud ou Go)."""
+        trilha = _buscar_trilha("Go")
+        self.assertIsNotNone(trilha)
+
+    def test_buscar_trilha_power_bi(self):
+        """Deve encontrar a trilha Power BI (adicionada na expansão do dataset)."""
+        trilha = _buscar_trilha("Power BI")
+        self.assertIsNotNone(trilha)
+
+    def test_buscar_trilha_linux(self):
+        """Deve encontrar a trilha Linux (adicionada na expansão do dataset)."""
+        trilha = _buscar_trilha("Linux")
+        self.assertIsNotNone(trilha)
+
+    def test_buscar_trilha_rust(self):
+        """Deve encontrar a trilha Rust (adicionada na expansão do dataset)."""
+        trilha = _buscar_trilha("Rust")
+        self.assertIsNotNone(trilha)
+
+    def test_buscar_trilha_spring_boot(self):
+        """Deve encontrar a trilha Spring Boot (adicionada na expansão do dataset)."""
+        trilha = _buscar_trilha("Spring Boot")
+        self.assertIsNotNone(trilha)
+
     def test_buscar_trilha_inexistente(self):
         """Deve retornar None para tecnologia inexistente."""
         trilha = _buscar_trilha("COBOL_XYZ_INEXISTENTE")
         self.assertIsNone(trilha)
+
+    def test_buscar_trilha_com_espacos_extras(self):
+        """Deve encontrar trilha mesmo com espaços extras na entrada."""
+        trilha = _buscar_trilha("  java  ")
+        self.assertIsNotNone(trilha)
 
 
 # ===========================================================================
@@ -84,6 +161,7 @@ class TestCmdTrilha(unittest.TestCase):
 
     def setUp(self):
         self.resultado_java = cmd_trilha("Java")
+        self.trilha_java = _buscar_trilha("Java")
 
     def test_trilha_java_retorna_string(self):
         """Deve retornar uma string não-vazia."""
@@ -120,21 +198,21 @@ class TestCmdTrilha(unittest.TestCase):
 
     def test_trilha_java_numero_modulos_correto(self):
         """O número de módulos listados deve corresponder ao campo numero_modulo."""
-        trilha = _buscar_trilha("Java")
-        # Conta ocorrências de linhas no formato "N. Módulo"
         modulos_encontrados = re.findall(r"^\d+\. Módulo", self.resultado_java, re.MULTILINE)
-        self.assertEqual(len(modulos_encontrados), trilha["numero_modulo"])
+        self.assertEqual(len(modulos_encontrados), self.trilha_java["numero_modulo"])
 
     def test_trilha_java_xp_correto(self):
         """O XP exibido deve ser o mesmo do JSON."""
-        trilha = _buscar_trilha("Java")
-        self.assertIn(str(trilha["xp_total"]), self.resultado_java)
+        self.assertIn(str(self.trilha_java["xp_total"]), self.resultado_java)
 
     def test_trilha_java_badges_corretas(self):
         """Todas as badges da trilha Java devem aparecer no resultado."""
-        trilha = _buscar_trilha("Java")
-        for badge in trilha["badges_disponiveis"]:
+        for badge in self.trilha_java["badges_disponiveis"]:
             self.assertIn(badge, self.resultado_java)
+
+    def test_trilha_java_vitalicio_sim(self):
+        """A trilha Java é vitalícia — deve exibir 'Sim'."""
+        self.assertIn("Sim", self.resultado_java)
 
     def test_trilha_tecnologia_inexistente(self):
         """Para tecnologia inexistente deve retornar mensagem de erro."""
@@ -148,6 +226,48 @@ class TestCmdTrilha(unittest.TestCase):
         resultado_upper = cmd_trilha("JAVA")
         self.assertNotIn("❌", resultado_lower)
         self.assertNotIn("❌", resultado_upper)
+
+    def test_trilha_python_retorna_resultado(self):
+        """Deve retornar plano de estudos para Python."""
+        resultado = cmd_trilha("Python")
+        self.assertNotIn("❌", resultado)
+        self.assertIn("Python", resultado)
+
+    def test_trilha_kotlin_retorna_resultado(self):
+        """Deve retornar plano de estudos para Kotlin (nova trilha)."""
+        resultado = cmd_trilha("Kotlin")
+        self.assertNotIn("❌", resultado)
+        self.assertIn("Kotlin", resultado)
+
+    def test_trilha_go_retorna_resultado(self):
+        """Deve retornar plano de estudos para Go (nova trilha)."""
+        resultado = cmd_trilha("Go")
+        self.assertNotIn("❌", resultado)
+        self.assertIn("Go", resultado)
+
+    def test_trilha_rust_retorna_resultado(self):
+        """Deve retornar plano de estudos para Rust (nova trilha)."""
+        resultado = cmd_trilha("Rust")
+        self.assertNotIn("❌", resultado)
+        self.assertIn("Rust", resultado)
+
+    def test_trilha_linux_retorna_resultado(self):
+        """Deve retornar plano de estudos para Linux (nova trilha)."""
+        resultado = cmd_trilha("Linux")
+        self.assertNotIn("❌", resultado)
+        self.assertIn("Linux", resultado)
+
+    def test_trilha_spring_boot_retorna_resultado(self):
+        """Deve retornar plano de estudos para Spring Boot (nova trilha)."""
+        resultado = cmd_trilha("Spring Boot")
+        self.assertNotIn("❌", resultado)
+        self.assertIn("Spring", resultado)
+
+    def test_trilha_erro_menciona_tecnologia(self):
+        """A mensagem de erro deve repetir o nome da tecnologia informada."""
+        tecnologia = "COBOL_XYZ_INEXISTENTE"
+        resultado = cmd_trilha(tecnologia)
+        self.assertIn(tecnologia, resultado)
 
 
 # ===========================================================================
@@ -194,6 +314,10 @@ class TestCmdDesafio(unittest.TestCase):
         resultado = cmd_desafio("Java", "Básico")
         self.assertIn("300", resultado)
 
+    def test_desafio_nivel_intermediario_xp_correto(self):
+        """Nível Intermediário deve gerar 600 XP."""
+        self.assertIn("600", self.resultado)
+
     def test_desafio_nivel_avancado_xp_correto(self):
         """Nível Avançado deve gerar 1000 XP."""
         resultado = cmd_desafio("Java", "Avançado")
@@ -209,10 +333,31 @@ class TestCmdDesafio(unittest.TestCase):
         resultado = cmd_desafio("Java", "Básico")
         self.assertIn("30", resultado)
 
+    def test_desafio_tempo_intermediario(self):
+        """Nível Intermediário deve ter 60 minutos."""
+        self.assertIn("60", self.resultado)
+
     def test_desafio_tempo_avancado(self):
         """Nível Avançado deve ter 120 minutos."""
         resultado = cmd_desafio("Java", "Avançado")
         self.assertIn("120", resultado)
+
+    def test_desafio_python_basico(self):
+        """Deve gerar desafio para Python Básico."""
+        resultado = cmd_desafio("Python", "Básico")
+        self.assertIn("Python", resultado)
+        self.assertIn("300", resultado)
+
+    def test_desafio_kotlin_avancado(self):
+        """Deve gerar desafio para Kotlin Avançado."""
+        resultado = cmd_desafio("Kotlin", "Avançado")
+        self.assertIn("Kotlin", resultado)
+        self.assertIn("1000", resultado)
+
+    def test_desafio_nivel_desconhecido_assume_intermediario(self):
+        """Nível desconhecido deve assumir 600 XP (Intermediário)."""
+        resultado = cmd_desafio("Python", "Especialista")
+        self.assertIn("600", resultado)
 
 
 # ===========================================================================
@@ -224,6 +369,7 @@ class TestCmdCertificado(unittest.TestCase):
     def setUp(self):
         self.nome = "Weverson RS"
         self.resultado = cmd_certificado(self.nome, "Java")
+        self.trilha_java = _buscar_trilha("Java")
 
     def test_certificado_retorna_string(self):
         """Deve retornar uma string não-vazia."""
@@ -238,28 +384,41 @@ class TestCmdCertificado(unittest.TestCase):
         """O certificado deve conter o nome da trilha Java."""
         self.assertIn("Java", self.resultado)
 
-    def test_certificado_contem_titulo(self):
-        """O certificado deve conter o título 'Certificado de Conclusão'."""
-        self.assertIn("Certificado de Conclusão", self.resultado)
+    def test_certificado_contem_titulo_certificacao_dio(self):
+        """O certificado deve conter o novo título 'Certificação DIO'."""
+        self.assertIn("Certificação DIO", self.resultado)
+
+    def test_certificado_contem_frase_atestamos(self):
+        """O certificado deve conter a frase 'Atestamos que o'."""
+        self.assertIn("Atestamos que o", self.resultado)
+
+    def test_certificado_contem_secao_informacoes(self):
+        """O certificado deve conter a seção 'Informações da Trilha'."""
+        self.assertIn("Informações da Trilha", self.resultado)
 
     def test_certificado_contem_xp(self):
         """O certificado deve conter o XP conquistado."""
-        trilha = _buscar_trilha("Java")
-        self.assertIn(str(trilha["xp_total"]), self.resultado)
+        self.assertIn(str(self.trilha_java["xp_total"]), self.resultado)
 
     def test_certificado_contem_nivel(self):
         """O certificado deve conter o nível da trilha."""
-        self.assertIn("Intermediário", self.resultado)
+        self.assertIn(self.trilha_java["nivel"], self.resultado)
 
     def test_certificado_contem_modulos(self):
         """O certificado deve conter a quantidade de módulos."""
-        trilha = _buscar_trilha("Java")
-        self.assertIn(str(trilha["numero_modulo"]), self.resultado)
+        self.assertIn(str(self.trilha_java["numero_modulo"]), self.resultado)
+
+    def test_certificado_contem_modulos_label(self):
+        """O certificado deve exibir módulos com sufixo 'módulos'."""
+        self.assertIn(f"{self.trilha_java['numero_modulo']} módulos", self.resultado)
+
+    def test_certificado_contem_lives_label(self):
+        """O certificado deve exibir lives com sufixo 'lives'."""
+        self.assertIn(f"{self.trilha_java['lives_ao_vivo']} lives", self.resultado)
 
     def test_certificado_contem_badges(self):
         """O certificado deve conter as badges da trilha Java."""
-        trilha = _buscar_trilha("Java")
-        for badge in trilha["badges_disponiveis"]:
+        for badge in self.trilha_java["badges_disponiveis"]:
             self.assertIn(badge, self.resultado)
 
     def test_certificado_contem_codigo_verificacao(self):
@@ -269,6 +428,13 @@ class TestCmdCertificado(unittest.TestCase):
     def test_certificado_contem_data_emissao(self):
         """O certificado deve conter a data de emissão."""
         self.assertIn("Data de Emissão", self.resultado)
+
+    def test_certificado_data_no_inicio(self):
+        """A data de emissão deve aparecer antes das badges (novo formato)."""
+        pos_data = self.resultado.find("Data de Emissão")
+        pos_badges = self.resultado.find("Badges Conquistadas")
+        self.assertLess(pos_data, pos_badges,
+                        "Data de Emissão deve aparecer antes das Badges no novo formato")
 
     def test_certificado_contem_aviso_ficticio(self):
         """O certificado deve conter aviso de que é fictício."""
@@ -293,6 +459,30 @@ class TestCmdCertificado(unittest.TestCase):
         padrao = r"DIO-\d{2}-\d{4}-\d{6}"
         self.assertRegex(self.resultado, padrao)
 
+    def test_certificado_python_nome_correto(self):
+        """Certificado de Python deve conter o nome da formação Python."""
+        resultado = cmd_certificado("Ana Lima", "Python")
+        self.assertIn("Ana Lima", resultado)
+        self.assertIn("Python", resultado)
+
+    def test_certificado_kotlin_gerado(self):
+        """Deve gerar certificado válido para Kotlin (nova trilha)."""
+        resultado = cmd_certificado("Carlos Dev", "Kotlin")
+        self.assertNotIn("❌", resultado)
+        self.assertIn("Kotlin", resultado)
+
+    def test_certificado_nao_vitalicio(self):
+        """Trilha não-vitalícia deve exibir 'Não' no certificado."""
+        # React (id=4) tem vitalicio=false
+        resultado = cmd_certificado("Teste", "React")
+        self.assertIn("Não", resultado)
+
+    def test_certificado_erro_menciona_trilha(self):
+        """Mensagem de erro deve mencionar o nome da trilha informada."""
+        trilha_invalida = "TrilhaInexistenteXYZ"
+        resultado = cmd_certificado("Teste", trilha_invalida)
+        self.assertIn(trilha_invalida, resultado)
+
 
 # ===========================================================================
 # Runner com relatório em .txt
@@ -302,7 +492,7 @@ if __name__ == "__main__":
     import io
     from datetime import datetime
 
-    output_dir = os.path.join(os.path.dirname(__file__), "..", "..", "dio_explorer", "docs")
+    output_dir = os.path.join(os.path.dirname(__file__), "..", "docs")
     os.makedirs(output_dir, exist_ok=True)
     resultado_path = os.path.join(output_dir, "resultado_testes.txt")
 
@@ -318,7 +508,7 @@ if __name__ == "__main__":
     erros = len(resultado.errors)
     aprovados = total - falhas - erros
     cobertura = (aprovados / total * 100) if total > 0 else 0
-    status_geral = "[APROVADO]" if cobertura >= 70 else "[REPROVADO]"
+    status_geral = "[APROVADO]" if cobertura >= 80 else "[REPROVADO]"
 
     relatorio = []
     relatorio.append("=" * 70)
@@ -337,7 +527,7 @@ if __name__ == "__main__":
     relatorio.append(f"  Falhas                     : {falhas}")
     relatorio.append(f"  Erros                      : {erros}")
     relatorio.append(f"  Taxa de aprovação          : {cobertura:.1f}%")
-    relatorio.append(f"  Meta mínima                : 70.0%")
+    relatorio.append(f"  Meta mínima                : 80.0%")
     relatorio.append(f"  Status geral               : {status_geral}")
     relatorio.append("")
 
@@ -365,4 +555,4 @@ if __name__ == "__main__":
 
     print(conteudo.encode("ascii", "replace").decode("ascii"))
     print(f"\nResultados gravados em: {resultado_path}")
-    sys.exit(0 if cobertura >= 70 else 1)
+    sys.exit(0 if cobertura >= 80 else 1)

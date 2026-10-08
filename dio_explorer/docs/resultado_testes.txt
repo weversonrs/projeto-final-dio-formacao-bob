@@ -1,6 +1,6 @@
 ======================================================================
   RELATÓRIO DE TESTES — DIO EXPLORER
-  Gerado em: 07/10/2026 19:40:36
+  Gerado em: 08/10/2026 17:46:57
 ======================================================================
 
 DETALHAMENTO DOS TESTES
@@ -15,20 +15,38 @@ test_certificado_contem_codigo_verificacao (__main__.TestCmdCertificado.test_cer
 O certificado deve conter um código de verificação DIO. ... ok
 test_certificado_contem_data_emissao (__main__.TestCmdCertificado.test_certificado_contem_data_emissao)
 O certificado deve conter a data de emissão. ... ok
+test_certificado_contem_frase_atestamos (__main__.TestCmdCertificado.test_certificado_contem_frase_atestamos)
+O certificado deve conter a frase 'Atestamos que o'. ... ok
 test_certificado_contem_link_dio (__main__.TestCmdCertificado.test_certificado_contem_link_dio)
 O certificado deve conter link para web.dio.me. ... ok
+test_certificado_contem_lives_label (__main__.TestCmdCertificado.test_certificado_contem_lives_label)
+O certificado deve exibir lives com sufixo 'lives'. ... ok
 test_certificado_contem_modulos (__main__.TestCmdCertificado.test_certificado_contem_modulos)
 O certificado deve conter a quantidade de módulos. ... ok
+test_certificado_contem_modulos_label (__main__.TestCmdCertificado.test_certificado_contem_modulos_label)
+O certificado deve exibir módulos com sufixo 'módulos'. ... ok
 test_certificado_contem_nivel (__main__.TestCmdCertificado.test_certificado_contem_nivel)
 O certificado deve conter o nível da trilha. ... ok
 test_certificado_contem_nome_trilha (__main__.TestCmdCertificado.test_certificado_contem_nome_trilha)
 O certificado deve conter o nome da trilha Java. ... ok
 test_certificado_contem_nome_usuario (__main__.TestCmdCertificado.test_certificado_contem_nome_usuario)
 O certificado deve conter o nome do usuário. ... ok
-test_certificado_contem_titulo (__main__.TestCmdCertificado.test_certificado_contem_titulo)
-O certificado deve conter o título 'Certificado de Conclusão'. ... ok
+test_certificado_contem_secao_informacoes (__main__.TestCmdCertificado.test_certificado_contem_secao_informacoes)
+O certificado deve conter a seção 'Informações da Trilha'. ... ok
+test_certificado_contem_titulo_certificacao_dio (__main__.TestCmdCertificado.test_certificado_contem_titulo_certificacao_dio)
+O certificado deve conter o novo título 'Certificação DIO'. ... ok
 test_certificado_contem_xp (__main__.TestCmdCertificado.test_certificado_contem_xp)
 O certificado deve conter o XP conquistado. ... ok
+test_certificado_data_no_inicio (__main__.TestCmdCertificado.test_certificado_data_no_inicio)
+A data de emissão deve aparecer antes das badges (novo formato). ... ok
+test_certificado_erro_menciona_trilha (__main__.TestCmdCertificado.test_certificado_erro_menciona_trilha)
+Mensagem de erro deve mencionar o nome da trilha informada. ... ok
+test_certificado_kotlin_gerado (__main__.TestCmdCertificado.test_certificado_kotlin_gerado)
+Deve gerar certificado válido para Kotlin (nova trilha). ... ok
+test_certificado_nao_vitalicio (__main__.TestCmdCertificado.test_certificado_nao_vitalicio)
+Trilha não-vitalícia deve exibir 'Não' no certificado. ... ok
+test_certificado_python_nome_correto (__main__.TestCmdCertificado.test_certificado_python_nome_correto)
+Certificado de Python deve conter o nome da formação Python. ... ok
 test_certificado_retorna_string (__main__.TestCmdCertificado.test_certificado_retorna_string)
 Deve retornar uma string não-vazia. ... ok
 test_certificado_trilha_inexistente (__main__.TestCmdCertificado.test_certificado_trilha_inexistente)
@@ -47,20 +65,34 @@ test_desafio_contem_tempo (__main__.TestCmdDesafio.test_desafio_contem_tempo)
 O resultado deve conter tempo estimado. ... ok
 test_desafio_contem_xp (__main__.TestCmdDesafio.test_desafio_contem_xp)
 O resultado deve conter XP ao concluir. ... ok
+test_desafio_kotlin_avancado (__main__.TestCmdDesafio.test_desafio_kotlin_avancado)
+Deve gerar desafio para Kotlin Avançado. ... ok
 test_desafio_nivel_avancado_xp_correto (__main__.TestCmdDesafio.test_desafio_nivel_avancado_xp_correto)
 Nível Avançado deve gerar 1000 XP. ... ok
 test_desafio_nivel_basico_xp_correto (__main__.TestCmdDesafio.test_desafio_nivel_basico_xp_correto)
 Nível Básico deve gerar 300 XP. ... ok
+test_desafio_nivel_desconhecido_assume_intermediario (__main__.TestCmdDesafio.test_desafio_nivel_desconhecido_assume_intermediario)
+Nível desconhecido deve assumir 600 XP (Intermediário). ... ok
+test_desafio_nivel_intermediario_xp_correto (__main__.TestCmdDesafio.test_desafio_nivel_intermediario_xp_correto)
+Nível Intermediário deve gerar 600 XP. ... ok
 test_desafio_nivel_padrao_quando_vazio (__main__.TestCmdDesafio.test_desafio_nivel_padrao_quando_vazio)
 Sem nível, deve assumir Intermediário. ... ok
+test_desafio_python_basico (__main__.TestCmdDesafio.test_desafio_python_basico)
+Deve gerar desafio para Python Básico. ... ok
 test_desafio_retorna_string (__main__.TestCmdDesafio.test_desafio_retorna_string)
 Deve retornar uma string não-vazia. ... ok
 test_desafio_tempo_avancado (__main__.TestCmdDesafio.test_desafio_tempo_avancado)
 Nível Avançado deve ter 120 minutos. ... ok
 test_desafio_tempo_basico (__main__.TestCmdDesafio.test_desafio_tempo_basico)
 Nível Básico deve ter 30 minutos. ... ok
+test_desafio_tempo_intermediario (__main__.TestCmdDesafio.test_desafio_tempo_intermediario)
+Nível Intermediário deve ter 60 minutos. ... ok
 test_trilha_case_insensitive (__main__.TestCmdTrilha.test_trilha_case_insensitive)
 A busca deve ser case-insensitive. ... ok
+test_trilha_erro_menciona_tecnologia (__main__.TestCmdTrilha.test_trilha_erro_menciona_tecnologia)
+A mensagem de erro deve repetir o nome da tecnologia informada. ... ok
+test_trilha_go_retorna_resultado (__main__.TestCmdTrilha.test_trilha_go_retorna_resultado)
+Deve retornar plano de estudos para Go (nova trilha). ... ok
 test_trilha_java_badges_corretas (__main__.TestCmdTrilha.test_trilha_java_badges_corretas)
 Todas as badges da trilha Java devem aparecer no resultado. ... ok
 test_trilha_java_contem_badges (__main__.TestCmdTrilha.test_trilha_java_contem_badges)
@@ -81,10 +113,26 @@ test_trilha_java_numero_modulos_correto (__main__.TestCmdTrilha.test_trilha_java
 O número de módulos listados deve corresponder ao campo numero_modulo. ... ok
 test_trilha_java_retorna_string (__main__.TestCmdTrilha.test_trilha_java_retorna_string)
 Deve retornar uma string não-vazia. ... ok
+test_trilha_java_vitalicio_sim (__main__.TestCmdTrilha.test_trilha_java_vitalicio_sim)
+A trilha Java é vitalícia — deve exibir 'Sim'. ... ok
 test_trilha_java_xp_correto (__main__.TestCmdTrilha.test_trilha_java_xp_correto)
 O XP exibido deve ser o mesmo do JSON. ... ok
+test_trilha_kotlin_retorna_resultado (__main__.TestCmdTrilha.test_trilha_kotlin_retorna_resultado)
+Deve retornar plano de estudos para Kotlin (nova trilha). ... ok
+test_trilha_linux_retorna_resultado (__main__.TestCmdTrilha.test_trilha_linux_retorna_resultado)
+Deve retornar plano de estudos para Linux (nova trilha). ... ok
+test_trilha_python_retorna_resultado (__main__.TestCmdTrilha.test_trilha_python_retorna_resultado)
+Deve retornar plano de estudos para Python. ... ok
+test_trilha_rust_retorna_resultado (__main__.TestCmdTrilha.test_trilha_rust_retorna_resultado)
+Deve retornar plano de estudos para Rust (nova trilha). ... ok
+test_trilha_spring_boot_retorna_resultado (__main__.TestCmdTrilha.test_trilha_spring_boot_retorna_resultado)
+Deve retornar plano de estudos para Spring Boot (nova trilha). ... ok
 test_trilha_tecnologia_inexistente (__main__.TestCmdTrilha.test_trilha_tecnologia_inexistente)
 Para tecnologia inexistente deve retornar mensagem de erro. ... ok
+test_buscar_trilha_com_espacos_extras (__main__.TestHelpers.test_buscar_trilha_com_espacos_extras)
+Deve encontrar trilha mesmo com espaços extras na entrada. ... ok
+test_buscar_trilha_go (__main__.TestHelpers.test_buscar_trilha_go)
+Deve encontrar uma trilha ao buscar por 'Go' (pode ser Google Cloud ou Go). ... ok
 test_buscar_trilha_inexistente (__main__.TestHelpers.test_buscar_trilha_inexistente)
 Deve retornar None para tecnologia inexistente. ... ok
 test_buscar_trilha_java_exato (__main__.TestHelpers.test_buscar_trilha_java_exato)
@@ -93,29 +141,53 @@ test_buscar_trilha_java_maiusculo (__main__.TestHelpers.test_buscar_trilha_java_
 Deve encontrar a trilha Java com entrada em maiúsculas. ... ok
 test_buscar_trilha_java_minusculo (__main__.TestHelpers.test_buscar_trilha_java_minusculo)
 Deve encontrar a trilha Java mesmo com entrada em minúsculas. ... ok
+test_buscar_trilha_kotlin (__main__.TestHelpers.test_buscar_trilha_kotlin)
+Deve encontrar a trilha Kotlin (adicionada na expansão do dataset). ... ok
+test_buscar_trilha_linux (__main__.TestHelpers.test_buscar_trilha_linux)
+Deve encontrar a trilha Linux (adicionada na expansão do dataset). ... ok
+test_buscar_trilha_power_bi (__main__.TestHelpers.test_buscar_trilha_power_bi)
+Deve encontrar a trilha Power BI (adicionada na expansão do dataset). ... ok
+test_buscar_trilha_python (__main__.TestHelpers.test_buscar_trilha_python)
+Deve encontrar a trilha Python. ... ok
+test_buscar_trilha_rust (__main__.TestHelpers.test_buscar_trilha_rust)
+Deve encontrar a trilha Rust (adicionada na expansão do dataset). ... ok
+test_buscar_trilha_spring_boot (__main__.TestHelpers.test_buscar_trilha_spring_boot)
+Deve encontrar a trilha Spring Boot (adicionada na expansão do dataset). ... ok
+test_load_trilhas_badges_nao_vazias (__main__.TestHelpers.test_load_trilhas_badges_nao_vazias)
+Cada trilha deve ter pelo menos uma badge disponível. ... ok
 test_load_trilhas_campos_obrigatorios (__main__.TestHelpers.test_load_trilhas_campos_obrigatorios)
 Cada trilha deve ter todos os campos obrigatórios. ... ok
+test_load_trilhas_ids_unicos (__main__.TestHelpers.test_load_trilhas_ids_unicos)
+Todos os IDs das trilhas devem ser únicos. ... ok
+test_load_trilhas_nivel_valido (__main__.TestHelpers.test_load_trilhas_nivel_valido)
+O campo 'nivel' de cada trilha deve ser Básico, Intermediário ou Avançado. ... ok
 test_load_trilhas_quantidade_minima (__main__.TestHelpers.test_load_trilhas_quantidade_minima)
-O arquivo deve conter pelo menos 30 trilhas. ... ok
+O arquivo deve conter pelo menos 40 trilhas. ... ok
 test_load_trilhas_retorna_lista (__main__.TestHelpers.test_load_trilhas_retorna_lista)
 _load_trilhas deve retornar uma lista não-vazia. ... ok
-test_vitalicio_label_false (__main__.TestHelpers.test_vitalicio_label_false) ... ok
-test_vitalicio_label_true (__main__.TestHelpers.test_vitalicio_label_true) ... ok
+test_load_trilhas_tecnologias_unicas (__main__.TestHelpers.test_load_trilhas_tecnologias_unicas)
+Todas as tecnologias devem ser únicas (sem duplicatas). ... ok
+test_load_trilhas_xp_positivo (__main__.TestHelpers.test_load_trilhas_xp_positivo)
+O campo 'xp_total' deve ser um inteiro positivo em todas as trilhas. ... ok
+test_vitalicio_label_false (__main__.TestHelpers.test_vitalicio_label_false)
+_vitalicio_label(False) deve retornar 'Não'. ... ok
+test_vitalicio_label_true (__main__.TestHelpers.test_vitalicio_label_true)
+_vitalicio_label(True) deve retornar 'Sim'. ... ok
 
 ----------------------------------------------------------------------
-Ran 49 tests in 0.007s
+Ran 84 tests in 0.017s
 
 OK
 
 ----------------------------------------------------------------------
 RESUMO
 ----------------------------------------------------------------------
-  Total de testes executados : 49
-  Aprovados                  : 49
+  Total de testes executados : 84
+  Aprovados                  : 84
   Falhas                     : 0
   Erros                      : 0
   Taxa de aprovação          : 100.0%
-  Meta mínima                : 70.0%
+  Meta mínima                : 80.0%
   Status geral               : [APROVADO]
 
 ======================================================================

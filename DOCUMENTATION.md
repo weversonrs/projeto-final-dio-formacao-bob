@@ -11,14 +11,15 @@
 2. [Estrutura de Arquivos](#2-estrutura-de-arquivos)
 3. [O Servidor MCP — dio-explorer](#3-o-servidor-mcp--dio-explorer)
 4. [Ferramentas MCP Disponíveis](#4-ferramentas-mcp-disponíveis)
-5. [Comandos Bob (/.bob/commands)](#5-comandos-bob-bobcommands)
-6. [Configuração do Bob (.bob/mcp.json e .bobignore)](#6-configuração-do-bob-bobmcpjson-e-bobignore)
-7. [Dataset — trilhas_dio.json](#7-dataset--trilhas_diojson)
-8. [Testes — Cobertura e Resultados](#8-testes--cobertura-e-resultados)
-9. [Todos os Prompts Usados na Construção](#9-todos-os-prompts-usados-na-construção)
-10. [Modos do Bob e Quando Usar](#10-modos-do-bob-e-quando-usar)
-11. [Dicas de Uso do Bob](#11-dicas-de-uso-do-bob)
-12. [Insights para Futuros Profissionais](#12-insights-para-futuros-profissionais)
+5. [Comandos Bob (.bob/commands) e Skills (.bob/skills)](#5-comandos-bob-bobcommands-e-skills-bobskills)
+6. [Interface Web — DIO Explorer](#6-interface-web--dio-explorer)
+7. [Configuração do Bob (.bob/mcp.json e .bobignore)](#7-configuração-do-bob-bobmcpjson-e-bobignore)
+8. [Dataset — trilhas_dio.json](#8-dataset--trilhas_diojson)
+9. [Testes — Cobertura e Resultados](#9-testes--cobertura-e-resultados)
+10. [Todos os Prompts Usados na Construção](#10-todos-os-prompts-usados-na-construção)
+11. [Modos do Bob e Quando Usar](#11-modos-do-bob-e-quando-usar)
+12. [Dicas de Uso do Bob](#12-dicas-de-uso-do-bob)
+13. [Insights para Futuros Profissionais](#13-insights-para-futuros-profissionais)
 
 ---
 
@@ -26,13 +27,16 @@
 
 O **DIO Explorer** é um servidor MCP (*Model Context Protocol*) construído do zero
 durante um bootcamp IBM Bob. Ele expõe **três ferramentas de IA** diretamente
-dentro do assistente IBM Bob:
+dentro do assistente IBM Bob, além de uma **interface web** independente que replica
+todas as funcionalidades sem depender do Bob:
 
-| Ferramenta | O que faz |
+| Componente | O que faz |
 |---|---|
-| `trilha` | Retorna um plano de estudos formatado para qualquer tecnologia do catálogo |
-| `desafio` | Gera um desafio de código criativo com nível configurável |
-| `certificado` | Emite um certificado fictício com código de verificação único |
+| Ferramenta MCP `trilha` | Retorna um plano de estudos formatado para qualquer tecnologia do catálogo |
+| Ferramenta MCP `desafio` | Gera um desafio de código com nível configurável |
+| Ferramenta MCP `certificado` | Emite um certificado fictício com código de verificação único |
+| Slash `/desafio-nivel` | Versão aprimorada do desafio com nível Iniciante/Intermediário/Avançado |
+| Interface Web | SPA estática em HTML/CSS/JS com todas as 4 funcionalidades acessíveis no navegador |
 
 O projeto demonstra, na prática, como **estender o IBM Bob com capacidades customizadas**
 via protocolo MCP sem depender de serviços externos — tudo roda localmente via `stdio`.
@@ -44,25 +48,37 @@ via protocolo MCP sem depender de serviços externos — tudo roda localmente vi
 ```
 ibm_bob/
 ├── .bob/
-│   ├── mcp.json                  ← Registro do servidor MCP no Bob
-│   └── commands/
-│       ├── trilha.md             ← Comando slash /trilha
-│       ├── desafio.md            ← Comando slash /desafio
-│       └── certificado.md        ← Comando slash /certificado
+│   ├── mcp.json                    ← Registro do servidor MCP no Bob
+│   ├── commands/
+│   │   ├── trilha.md               ← Slash /trilha
+│   │   ├── desafio.md              ← Slash /desafio
+│   │   ├── desafio-nivel.md        ← Slash /desafio-nivel (novo)
+│   │   └── certificado.md          ← Slash /certificado
+│   └── skills/
+│       ├── trilha/SKILL.md         ← Skill encapsulada /trilha
+│       ├── desafio/SKILL.md        ← Skill encapsulada /desafio
+│       ├── desafio-nivel/SKILL.md  ← Skill encapsulada /desafio-nivel (novo)
+│       └── certificado/SKILL.md    ← Skill encapsulada /certificado
 │
-├── .bobignore                    ← Arquivos excluídos do contexto do Bob
-├── Hello_world.md                ← Primeiro arquivo criado no projeto
+├── .bobignore                      ← Arquivos excluídos do contexto do Bob
+├── Hello_world.md                  ← Primeiro arquivo criado no projeto
+├── DOCUMENTATION.md                ← Este arquivo
 │
 └── dio_explorer/
     ├── data/
-    │   └── trilhas_dio.json      ← Dataset com 30 trilhas de formação
+    │   └── trilhas_dio.json        ← Dataset com 40 trilhas de formação
     ├── docs/
-    │   └── resultado_testes.txt  ← Relatório de 49 testes (100% aprovados)
+    │   └── resultado_testes.txt    ← Relatório de 84 testes (100% aprovados)
+    ├── interface/
+    │   └── index.html              ← Interface web estática (novo)
+    ├── src/
+    │   ├── dio_explorer.py         ← Módulo Python com as funções dos comandos
+    │   └── test_dio_explorer.py    ← Suíte de 84 testes unitários
     └── mcp/
         ├── src/
-        │   └── index.ts          ← Código-fonte TypeScript do servidor MCP
+        │   └── index.ts            ← Código-fonte TypeScript do servidor MCP
         ├── build/
-        │   └── index.js          ← Build compilado (executado pelo Bob)
+        │   └── index.js            ← Build compilado (executado pelo Bob)
         ├── package.json
         └── tsconfig.json
 ```
@@ -103,7 +119,7 @@ Bob (cliente MCP)
 dio-explorer MCP Server (index.js)
     │
     ├── loadTrilhas()        ← lê trilhas_dio.json
-    ├── buscarTrilha()       ← busca case-insensitive
+    ├── buscarTrilha()       ← busca case-insensitive por tecnologia ou nome
     ├── vitalicioLabel()     ← boolean → "Sim"/"Não"
     ├── hoje()               ← data formatada pt-BR
     └── randomInt()          ← aleatoriedade nos certificados e desafios
@@ -127,9 +143,9 @@ dio-explorer MCP Server (index.js)
 Mostre a trilha de estudos para Python
 ```
 
-**Saída:** Markdown estruturado com tecnologia, nível, XP, módulos numerados e badges.
+**Saída:** Markdown com tecnologia, nível, XP, módulos numerados, badges e próximos passos.
 
-**Comportamento de erro:** Retorna mensagem `❌ Nenhuma trilha encontrada para "X"` quando a tecnologia não existe no dataset.
+**Comportamento de erro:** Retorna `❌ Nenhuma trilha encontrada para "X"` quando a tecnologia não existe no dataset.
 
 ---
 
@@ -180,44 +196,148 @@ Gere um certificado para Maria Silva na trilha de Java
 
 ---
 
-## 5. Comandos Bob (`.bob/commands`)
+## 5. Comandos Bob (`.bob/commands`) e Skills (`.bob/skills`)
 
-Os comandos slash permitem chamar as ferramentas MCP diretamente pelo nome,
-com argumentos posicionais (`$1`, `$2`).
+Os comandos slash ficam em `.bob/commands/` e ficam visíveis como `/nome-do-comando`
+na interface do Bob. Cada comando possui uma **Skill** correspondente em `.bob/skills/`
+que encapsula as instruções detalhadas de geração.
+
+| Comando | Argumentos | Skill | Descrição |
+|---|---|---|---|
+| `/trilha` | `<tecnologia>` | `trilha/SKILL.md` | Plano de estudos da trilha |
+| `/desafio` | `<tecnologia> <nivel>` | `desafio/SKILL.md` | Desafio simples de código |
+| `/desafio-nivel` | `<tecnologia> <nivel>` | `desafio-nivel/SKILL.md` | Desafio completo com Iniciante/Intermediário/Avançado |
+| `/certificado` | `<seu-nome> <trilha>` | `certificado/SKILL.md` | Certificado fictício de conclusão |
+
+---
 
 ### `/trilha <tecnologia>`
 
-```markdown
+```
 Argument-hint: <tecnologia>
 Exemplo: /trilha React
 ```
 
-O comando lê `trilhas_dio.json`, localiza a trilha e gera o plano de estudos
-com módulos fictícios numerados e badges listadas.
+Lê `trilhas_dio.json`, localiza a trilha e gera:
+- Metadados: tecnologia, nível, XP, acesso vitalício, lives
+- Módulos numerados com títulos coerentes e progressão lógica
+- Badges disponíveis
+- Seção **🚀 Próximos Passos** com 3 dicas específicas
+
+---
 
 ### `/desafio <tecnologia> <nivel>`
 
-```markdown
+```
 Argument-hint: <tecnologia> <nivel>
 Exemplo: /desafio Python Básico
 ```
 
-Gera um desafio com contexto realista (e-commerce, banco, jogo etc.).
-Se `$2` estiver vazio, assume **Intermediário**.
+Gera um desafio simples. Se `$2` estiver vazio, assume **Intermediário**.
+
+**Saída:** título, nível, tempo, XP, descrição de 1 linha, entrada esperada, saída esperada.
+
+---
+
+### `/desafio-nivel <tecnologia> <nivel>`
+
+```
+Argument-hint: <tecnologia> <nivel>
+Exemplo: /desafio-nivel Kotlin Avançado
+```
+
+Versão aprimorada do `/desafio`. Diferenciais:
+
+| Aspecto | `/desafio` | `/desafio-nivel` |
+|---|---|---|
+| Escala de níveis | Básico / Intermediário / Avançado | **Iniciante** / Intermediário / Avançado |
+| Normalização de entrada | Sem normalização | Aceita variações livres ("basico", "AVANÇADO", "advanced") |
+| Descrição | 1 linha | 4+ linhas com contexto de negócio e foco do nível |
+| Exemplos | Nenhum | **2 pares** entrada/saída (caso normal + caso de borda) |
+| Restrições | — | 3 a 5 itens técnicos |
+| Critérios de avaliação | — | 4 a 6 itens |
+| Dica | — | Específica para tecnologia e nível |
+| Bônus | — | ✅ Seção **🚀 Bônus (opcional)** |
+
+**Mapeamento XP / Tempo:**
+| Nível | XP | Tempo |
+|---|---|---|
+| Iniciante | 300 XP | 30 min |
+| Intermediário | 600 XP | 60 min |
+| Avançado | 1000 XP | 120 min |
+
+---
 
 ### `/certificado <seu-nome> <trilha>`
 
-```markdown
+```
 Argument-hint: <seu-nome> <trilha>
 Exemplo: /certificado "João Silva" Java
 ```
 
-Emite o certificado com data real de emissão e código único.
-Busca a trilha de forma aproximada (case-insensitive).
+Emite o certificado com:
+- Frase de atestação com nome e trilha
+- Data real de emissão e código único `DIO-XX-AAAA-NNNNNN`
+- Tabela de informações da trilha (tecnologia, nível, módulos, XP, lives, acesso vitalício)
+- Badges conquistadas
+- Aviso de caráter fictício e link para `web.dio.me`
 
 ---
 
-## 6. Configuração do Bob (`.bob/mcp.json` e `.bobignore`)
+## 6. Interface Web — DIO Explorer
+
+A interface web é um **Single Page Application** 100% estático localizado em
+`dio_explorer/interface/index.html`. Abre diretamente no navegador com duplo clique —
+sem servidor, sem dependências externas.
+
+### Tecnologias
+
+| Item | Detalhe |
+|---|---|
+| Linguagem | HTML5 + CSS3 + JavaScript (Vanilla ES6+) |
+| Dependências | Nenhuma — tudo inline |
+| Dados | Dataset das 40 trilhas embutido diretamente no JS |
+| Markdown | Renderer próprio (sem biblioteca) |
+
+### Abas Disponíveis
+
+| Aba | Slash equivalente | O que faz |
+|---|---|---|
+| 📚 Trilhas | `/trilha` | Busca por tecnologia + grid clicável com filtro por nome e nível |
+| 💻 Desafio | `/desafio` | Desafio simples com níveis Básico / Intermediário / Avançado |
+| 🎯 Desafio Nível | `/desafio-nivel` | Desafio completo com níveis Iniciante / Intermediário / Avançado |
+| 🎓 Certificado | `/certificado` | Emissão de certificado fictício |
+
+### Detalhes por Aba
+
+**📚 Trilhas**
+- Campo de busca por tecnologia → exibe plano de estudos com módulos e badges
+- Grid de cards com todas as 40 trilhas, filtráveis por nome/tecnologia e nível
+- Clicar em um card preenche automaticamente o campo de busca e exibe o plano
+
+**💻 Desafio**
+- Select: Básico / Intermediário / Avançado
+- Saída idêntica ao `cmd_desafio()` do módulo Python: descrição de 1 linha, entrada e saída esperadas
+
+**🎯 Desafio Nível**
+- Select: **Iniciante** / Intermediário / Avançado (escala diferente do `/desafio`)
+- Saída completa: descrição com foco do nível, 2 pares de exemplo, restrições, critérios, dica específica, seção Bônus
+- Normalização de texto livre via `normalizarNivel()`: aceita "basico", "AVANÇADO", "advanced" etc.
+
+**🎓 Certificado**
+- Campos: nome completo + tecnologia
+- Saída idêntica ao `cmd_certificado()` do módulo Python: atestação, data, código, tabela de informações, badges
+
+### Barra de Estatísticas
+
+Exibida no topo da página, calculada dinamicamente:
+- Total de trilhas (40)
+- XP total acumulado (~210k XP)
+- Contagem por nível (Básico, Intermediário, Avançado)
+
+---
+
+## 7. Configuração do Bob (`.bob/mcp.json` e `.bobignore`)
 
 ### `.bob/mcp.json`
 
@@ -252,18 +372,20 @@ evita que arquivos desnecessários consumam tokens do modelo.
 
 ---
 
-## 7. Dataset — trilhas_dio.json
+## 8. Dataset — trilhas_dio.json
 
-O dataset contém **30 trilhas de formação** cobrindo as principais tecnologias do mercado:
+O dataset contém **40 trilhas de formação** cobrindo as principais tecnologias do mercado.
+O arquivo foi expandido de 30 para 40 trilhas durante o bootcamp (IDs 31–40).
 
 | Categoria | Tecnologias |
 |---|---|
-| Linguagens Back-end | Python, Java, Node.js, PHP, C#, TypeScript |
-| Front-end | JavaScript, React, Angular, Vue.js |
+| Linguagens Back-end | Python, Java, Node.js, PHP, C#, TypeScript, Go, Rust, Kotlin |
+| Frameworks Back-end | Spring Boot, NestJS |
+| Front-end | JavaScript, React, Angular, Vue.js, Next.js |
 | Mobile | Flutter, Android, iOS |
-| Cloud | AWS, Microsoft Azure, Google Cloud |
-| Dados & IA | Machine Learning, Data Science, Data Engineering, IA Generativa, IBM watsonx |
-| Infraestrutura | DevOps, Containers (Docker/K8s) |
+| Cloud | AWS, Microsoft Azure, Google Cloud, Cloud Native |
+| Dados & IA | Machine Learning, Data Science, Data Engineering, IA Generativa, IBM watsonx, Power BI |
+| Infraestrutura | DevOps, Containers (Docker/K8s), Linux, RPA |
 | Banco de Dados | SQL, MongoDB |
 | Especialidades | Cybersecurity, Blockchain, Unity, QA, Prompt Engineering |
 
@@ -271,7 +393,7 @@ O dataset contém **30 trilhas de formação** cobrindo as principais tecnologia
 
 ```typescript
 interface Trilha {
-  id: number;                    // Identificador único (1–30)
+  id: number;                    // Identificador único (1–40)
   nome: string;                  // "Formação Java Developer"
   tecnologia: string;            // "Java"
   nivel: string;                 // "Básico" | "Intermediário" | "Avançado"
@@ -285,40 +407,82 @@ interface Trilha {
 
 ---
 
-## 8. Testes — Cobertura e Resultados
+## 9. Testes — Cobertura e Resultados
 
-O projeto possui uma suíte completa de testes unitários e de integração:
+O projeto possui uma suíte completa de testes unitários em `dio_explorer/src/test_dio_explorer.py`.
+A meta mínima foi elevada de **70%** para **80%** durante o bootcamp.
 
 | Categoria | Testes | Resultado |
 |---|---|---|
-| `TestHelpers` | 9 testes | ✅ OK |
-| `TestCmdTrilha` | 13 testes | ✅ OK |
-| `TestCmdDesafio` | 12 testes | ✅ OK |
-| `TestCmdCertificado` | 15 testes | ✅ OK |
-| **TOTAL** | **49 testes** | **100% aprovados** |
+| `TestHelpers` | 19 testes | ✅ OK |
+| `TestCmdTrilha` | 22 testes | ✅ OK |
+| `TestCmdDesafio` | 13 testes | ✅ OK |
+| `TestCmdCertificado` | 24 testes | ✅ OK |
+| **TOTAL** | **84 testes** | **100% aprovados** |
 
 **Relatório gerado em:** `dio_explorer/docs/resultado_testes.txt`
 
+Para rodar os testes:
+```bash
+py dio_explorer/src/test_dio_explorer.py
+```
+
 ### O que é testado
 
-- Busca case-insensitive de trilhas
-- Campos obrigatórios no JSON
-- XP e tempo corretos por nível
-- Formato do código de verificação (`DIO-XX-AAAA-NNNNNN`)
-- Comportamento para tecnologias inexistentes
-- Presença de badges, módulos, nível, XP nos outputs
-- Aviso de certificado fictício e link para `web.dio.me`
+**TestHelpers (19 testes)**
+- `_load_trilhas()` retorna lista não-vazia
+- Dataset contém pelo menos 40 trilhas
+- Todos os campos obrigatórios presentes em cada trilha
+- IDs únicos e tecnologias únicas no dataset
+- Nível válido (`Básico`, `Intermediário`, `Avançado`) em todas as trilhas
+- `xp_total` inteiro positivo em todas as trilhas
+- `badges_disponiveis` não-vazia em todas as trilhas
+- `_vitalicio_label()` correto para `True` e `False`
+- Busca case-insensitive (java, JAVA, Java), por substring, com espaços extras
+- Busca por tecnologias das trilhas expandidas (Kotlin, Go, Power BI, Linux, Rust, Spring Boot)
+- Retorno `None` para tecnologia inexistente
+
+**TestCmdTrilha (22 testes)**
+- Retorna string não-vazia
+- Contém nome da formação, nível, XP, lives, vitalício, módulos, badges
+- Número de módulos listados corresponde ao campo `numero_modulo`
+- XP exibido bate com o JSON
+- Todas as badges aparecem no resultado
+- Mensagem de erro menciona a tecnologia informada
+- Funciona para trilhas novas: Python, Kotlin, Go, Rust, Linux, Spring Boot
+
+**TestCmdDesafio (13 testes)**
+- Retorna string não-vazia
+- Contém tecnologia, nível, tempo, XP, descrição, entrada/saída
+- XP e tempo corretos para Básico (300/30), Intermediário (600/60), Avançado (1000/120)
+- Nível padrão quando vazio → Intermediário
+- Nível desconhecido assume 600 XP (Intermediário)
+- Funciona para Python, Kotlin
+
+**TestCmdCertificado (24 testes)**
+- Retorna string não-vazia
+- Contém nome do usuário, nome da trilha, título, XP, nível, módulos, lives, badges
+- Título correto: `# 🎓 Certificação DIO`
+- Frase de atestação presente
+- Seção `## 📋 Informações da Trilha` presente
+- Sufixos corretos: `N módulos`, `N lives`
+- Data de emissão aparece **antes** das badges
+- Código de verificação no formato `DIO-XX-AAAA-NNNNNN`
+- Campo vitalício: "Sim" para trilhas vitalícias, "Não" para não-vitalícias
+- Aviso de certificado fictício e link `web.dio.me`
+- Mensagem de erro menciona a trilha informada
+- Funciona para Python, Kotlin (trilha nova)
 
 ---
 
-## 9. Todos os Prompts Usados na Construção
+## 10. Todos os Prompts Usados na Construção
 
 Esta seção registra os prompts-chave que guiaram a criação de cada componente.
 São excelentes referências para quem quer aprender Engenharia de Prompts com o Bob.
 
 ---
 
-### 9.1 Criação do Dataset
+### 10.1 Criação do Dataset
 
 ```
 Crie um arquivo JSON com 30 trilhas de formação da plataforma DIO cobrindo
@@ -330,7 +494,7 @@ Salve em dio_explorer/data/trilhas_dio.json.
 
 ---
 
-### 9.2 Criação do Servidor MCP
+### 10.2 Criação do Servidor MCP
 
 ```
 Construa um servidor MCP em TypeScript usando @modelcontextprotocol/sdk.
@@ -342,7 +506,7 @@ Use transporte stdio. Salve em dio_explorer/mcp/src/index.ts.
 
 ---
 
-### 9.3 Configuração do MCP no Bob
+### 10.3 Configuração do MCP no Bob
 
 ```
 Configure o servidor MCP dio-explorer no arquivo .bob/mcp.json
@@ -352,7 +516,7 @@ O servidor deve ser executado com node apontando para o build compilado.
 
 ---
 
-### 9.4 Criação dos Comandos Slash
+### 10.4 Criação dos Comandos Slash
 
 ```
 Crie três comandos slash para o Bob em .bob/commands/:
@@ -364,7 +528,7 @@ Cada comando deve ter description e argument-hint no frontmatter YAML.
 
 ---
 
-### 9.5 Criação do .bobignore
+### 10.5 Criação do .bobignore
 
 ```
 Crie um arquivo .bobignore excluindo node_modules, .env,
@@ -374,7 +538,7 @@ do contexto de leitura do Bob.
 
 ---
 
-### 9.6 Criação dos Testes
+### 10.6 Criação dos Testes
 
 ```
 Crie uma suíte de testes completa para o projeto DIO Explorer cobrindo:
@@ -385,7 +549,7 @@ Meta mínima de 70% de aprovação. Gere o relatório em resultado_testes.txt.
 
 ---
 
-### 9.7 Documentação Final
+### 10.7 Documentação Inicial
 
 ```
 Bob, documente todo o projeto feito até o momento, com todos os prompts usados,
@@ -395,7 +559,111 @@ aprender com nosso projeto.
 
 ---
 
-## 10. Modos do Bob e Quando Usar
+### 10.8 Refatoração dos Slash Commands com Skills
+
+```
+revise os arquivos de testes criados e o arquivo com os resultados após a
+refatoração da criação dos slash commands
+```
+
+> **O que foi feito:**
+> Os três slash commands foram revisados e complementados com Skills do Bob (`.bob/skills/`)
+> que encapsulam as instruções de geração de resposta. O arquivo de testes `test_dio_explorer.py`
+> teve seus caminhos corrigidos (`sys.path` e `output_dir`), e o relatório
+> `resultado_testes.txt` foi regenerado — **49/49 testes aprovados (100%)**.
+
+---
+
+### 10.9 Expansão do Dataset e Testes
+
+```
+Expanda o dataset para 40 trilhas, adicionando as tecnologias:
+Kotlin, Go, Power BI, Linux, Rust, NestJS, Next.js, Spring Boot, RPA, Cloud Native.
+Atualize a suíte de testes para cobrir as novas trilhas e eleve a meta para 80%.
+```
+
+> **O que foi feito:**
+> O arquivo `trilhas_dio.json` foi expandido de 30 para 40 trilhas (IDs 31–40).
+> A suíte de testes foi ampliada de 49 para **84 testes**, cobrindo as novas trilhas,
+> validações adicionais do dataset (IDs únicos, tecnologias únicas, nível válido,
+> XP positivo, badges não-vazias) e novos casos para os três comandos.
+> Meta elevada de 70% para **80%**. Resultado: **84/84 aprovados (100%)**.
+
+---
+
+### 10.10 Criação da Interface Web
+
+```
+Bob, crie uma interface para possibilitar o acesso ao projeto
+```
+
+> **O que foi feito:**
+> Criado `dio_explorer/interface/index.html` — SPA estático com 4 abas mapeando
+> os 4 slash commands do projeto. Dataset das 40 trilhas embutido no JS.
+> Markdown renderer próprio, barra de estatísticas dinâmica, grid clicável com
+> filtros, spinner de loading, suporte a Enter nos campos de texto.
+
+---
+
+### 10.11 Revisão do Certificado
+
+```
+Bob, revise o certificado considerando que as informações não foram atualizadas
+com as mudanças solicitadas.
+```
+
+> **O que foi feito:**
+> `.bob/commands/certificado.md` e `.bob/skills/certificado/SKILL.md` foram
+> sincronizados com o formato atual do `cmd_certificado()` em `dio_explorer.py`:
+> título `# 🎓 Certificação DIO`, frase de atestação, data/código antes das badges,
+> tabela com cabeçalho `Campo | Valor`, sufixos `N módulos` / `N lives`,
+> badges listadas como `- 🥇 **{nome}**` (sem invenção de descrições).
+
+---
+
+### 10.12 Revisão da Interface com Mudanças do Repositório
+
+```
+Bob, revise o projeto com as alterações criadas desde o último commit
+para que as mudanças estejam disponíveis na interface criada.
+```
+
+> **O que foi feito:**
+> A função `showCertificado()` da interface foi alinhada ao `cmd_certificado()`
+> atual do Python (que havia sido revertido para o formato anterior ao MCP).
+> As 10 trilhas adicionadas (IDs 31–40) já estavam na interface desde a criação.
+
+---
+
+### 10.13 Adição da Aba Desafio Nível
+
+```
+Bob, a slash /desafio-nivel não está disponível na interface criada
+```
+
+> **O que foi feito:**
+> Adicionada a aba **🎯 Desafio Nível** na interface, mapeando o slash `/desafio-nivel`.
+> Implementada a função `showDesafioNivel()` com escala Iniciante/Intermediário/Avançado,
+> normalização de texto livre, 2 pares de exemplo, 6 critérios, dica específica e
+> seção 🚀 Bônus.
+
+---
+
+### 10.14 Distinção Visual entre Abas Desafio e Desafio Nível
+
+```
+Bob, revise as abas "Desafio" e "Desafio Nível" considerando que estão
+apresentando o mesmo comportamento.
+```
+
+> **O que foi feito:**
+> `showDesafio()` foi restaurado ao conteúdo exato do `cmd_desafio()` do commit
+> (sem seções extras). Títulos dos cards atualizados para identificar claramente
+> o slash de cada aba. Subtítulos descritivos adicionados a cada card.
+
+---
+
+## 11. Modos do Bob e Quando Usar
 
 O IBM Bob possui três modos principais. Entender quando usar cada um é fundamental
 para obter o melhor resultado.
@@ -408,8 +676,9 @@ para obter o melhor resultado.
 Exemplos usados neste projeto:
 - Criar o servidor MCP em TypeScript
 - Compilar o projeto com tsc
-- Criar os comandos slash
+- Criar os comandos slash e skills
 - Gerar o dataset JSON
+- Criar a interface web
 ```
 
 **Ferramentas disponíveis:** Todas (leitura, escrita, execução de comandos, MCP, charts).
@@ -444,7 +713,7 @@ Exemplos de uso:
 
 ---
 
-## 11. Dicas de Uso do Bob
+## 12. Dicas de Uso do Bob
 
 ### 💡 Seja específico nos prompts
 
@@ -515,7 +784,15 @@ node dio_explorer/mcp/build/index.js
 
 ---
 
-## 12. Insights para Futuros Profissionais
+### 💡 Interfaces web como documentação executável
+
+A interface `dio_explorer/interface/index.html` é um artefato de documentação viva —
+ela mostra exatamente o que cada slash command produz, sem depender do Bob estar
+em execução. Use-a para demonstrações, onboarding e validação visual.
+
+---
+
+## 13. Insights para Futuros Profissionais
 
 ### 🔑 O MCP é a nova forma de estender assistentes de IA
 
@@ -550,6 +827,14 @@ Invista tempo em criar bons comandos slash — eles multiplicam a produtividade.
 
 ---
 
+### 🔑 Skills encapsulam conhecimento reutilizável
+
+As Skills (`.bob/skills/`) são instruções especializadas que o Bob carrega sob demanda.
+Quando um slash command aciona uma skill, o Bob recebe instruções detalhadas sem
+precisar de um prompt longo. É a forma mais eficiente de padronizar comportamentos.
+
+---
+
 ### 🔑 Engenharia de Prompts é uma habilidade técnica
 
 Os prompts usados neste projeto não foram aleatórios. Cada um especificou:
@@ -564,7 +849,7 @@ Um prompt bem estruturado economiza várias iterações de correção.
 
 ### 🔑 Testes são documentação viva
 
-Os 49 testes deste projeto documentam o comportamento esperado de cada ferramenta.
+Os 84 testes deste projeto documentam o comportamento esperado de cada ferramenta.
 Quando um novo desenvolvedor entra no projeto, os testes explicam as regras de negócio
 melhor do que qualquer comentário de código.
 
@@ -577,10 +862,19 @@ Menos arquivos irrelevantes = menos ruído = respostas mais precisas.
 
 ---
 
+### 🔑 Interfaces web como ponte entre IA e usuário
+
+A interface `index.html` demonstra um padrão importante: **desacoplar a lógica de negócio
+da ferramenta de IA**. O módulo Python (`dio_explorer.py`) é a fonte da verdade;
+o MCP, os slash commands e a interface web são apenas formas diferentes de expor
+a mesma funcionalidade. Esse padrão facilita manutenção e testes.
+
+---
+
 ### 🔑 Iterate rápido, documente cedo
 
 Este projeto foi construído em ciclos curtos:
-1. Dataset → 2. Servidor MCP → 3. Comandos slash → 4. Testes → 5. Documentação
+1. Dataset → 2. Servidor MCP → 3. Comandos slash → 4. Testes → 5. Interface Web → 6. Documentação
 
 Cada etapa validou a anterior. Não espere o projeto estar "pronto" para documentar —
 a documentação é parte do produto.
